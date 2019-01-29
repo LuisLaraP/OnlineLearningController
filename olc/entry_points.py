@@ -2,5 +2,5 @@
 
 
 def olc():
-    """Run main entry point."""
+    """Run an experiment using a specification file."""
     pass
