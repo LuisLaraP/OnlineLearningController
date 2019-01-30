@@ -19,6 +19,11 @@ def olc():
     with open(args.filename, 'r') as specsFile:
         specs = json.load(specsFile)
     try:
-        envs.make(specs['environment'])
+        environment = envs.make(specs['environment'])
     except:  # noqa: E722
         exit(1)
+    environment.reset()
+    for _ in range(500):
+        environment.render()
+        environment.step(environment.action_space.sample())
+    environment.close()
