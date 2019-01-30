@@ -1,6 +1,7 @@
 """Definitions for all entry points."""
 
 import argparse
+import json
 
 
 def olc():
@@ -13,3 +14,6 @@ def olc():
         help='path to the specifications file to be used.'
     )
     args = parser.parse_args()
+    with open(args.filename, 'r') as specsFile:
+        specs = json.load(specsFile)
+    print(specs)
