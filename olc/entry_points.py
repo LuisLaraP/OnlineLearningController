@@ -3,6 +3,8 @@
 import argparse
 import json
 
+import olc.environments as envs
+
 
 def olc():
     """Run an experiment using a specification file."""
@@ -16,4 +18,7 @@ def olc():
     args = parser.parse_args()
     with open(args.filename, 'r') as specsFile:
         specs = json.load(specsFile)
-    print(specs)
+    try:
+        envs.make(specs['environment'])
+    except:  # noqa: E722
+        exit(1)
