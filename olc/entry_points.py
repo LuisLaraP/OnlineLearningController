@@ -22,8 +22,11 @@ def olc():
         environment = envs.make(specs['environment'])
     except:  # noqa: E722
         exit(1)
-    environment.reset()
+    reset = True
     for _ in range(specs['steps']):
+        if reset:
+            state = environment.reset()
         environment.render()
-        environment.step(environment.action_space.sample())
+        action = environment.action_space.sample()
+        state, reward, reset, info = environment.step(action)
     environment.close()

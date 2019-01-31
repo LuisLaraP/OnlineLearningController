@@ -1,4 +1,4 @@
 {
-	"environment": "Pendulum-v0",
+	"environment": "CartPole-v0",
 	"steps": 100
 }
