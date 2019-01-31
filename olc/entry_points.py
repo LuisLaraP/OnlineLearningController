@@ -23,7 +23,7 @@ def olc():
     except:  # noqa: E722
         exit(1)
     environment.reset()
-    for _ in range(500):
+    for _ in range(specs['steps']):
         environment.render()
         environment.step(environment.action_space.sample())
     environment.close()
