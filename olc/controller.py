@@ -24,7 +24,7 @@ class Controller:
         Run an experiment on the environment.
 
         The simulation will run for exactly the amount of steps specified. If
-        an episode ends before reaching the goal number of steps, the
+        an episode ends before reaching the target number of steps, the
         environment is reset and the experiment continues.
 
         Parameters
