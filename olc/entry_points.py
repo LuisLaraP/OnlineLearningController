@@ -4,6 +4,7 @@ import argparse
 import json
 
 import olc.environments as envs
+from .controller import Controller
 
 
 def olc():
@@ -22,11 +23,6 @@ def olc():
         environment = envs.make(specs['environment'])
     except:  # noqa: E722
         exit(1)
-    reset = True
-    for _ in range(specs['steps']):
-        if reset:
-            state = environment.reset()
-        environment.render()
-        action = environment.action_space.sample()
-        state, reward, reset, info = environment.step(action)
+    controller = Controller(environment)
+    controller.run(specs['steps'])
     environment.close()
