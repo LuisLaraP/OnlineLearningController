@@ -13,4 +13,7 @@ make
 	Create a new instance of the given environment.
 """
 
-from .launcher import make
+from .launcher import make, register
+from .reach import Reach
+
+register('Reach', Reach)

@@ -1,12 +1,14 @@
 """Launcher of environment instances."""
 
+_registry = {}
+
 
 def make(name):
 	"""
 	Create a new instance of the given environment.
 
-	If the given environment is not found in the `gym` package, an error is
-	raised.
+	The internal registry is searched first. If no package with the given name is
+	found, the lookup continues in the `gym` package, if it is installed.
 
 	Parameters
 	----------
@@ -18,6 +20,8 @@ def make(name):
 	env
 		Instance of the environment `name`.
 	"""
+	if name in _registry:
+		return _registry[name]()
 	try:
 		import gym
 		env = gym.make(name)
@@ -29,3 +33,18 @@ def make(name):
 		print(msg.format(name))
 		raise
 	return env
+
+
+def register(name, object):
+	"""
+	Add a new environment to the internal registry.
+
+	Parameters
+	----------
+	name : str
+		Unique identifier for the new environment.
+	object : class
+		Class to instantiate for this environment.
+	"""
+	assert name not in _registry
+	_registry[name] = object
