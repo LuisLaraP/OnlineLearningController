@@ -10,7 +10,7 @@ environments.
 Routines
 --------
 make
-    Create a new instance of the given environment.
+	Create a new instance of the given environment.
 """
 
 from .launcher import make
