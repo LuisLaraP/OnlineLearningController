@@ -8,12 +8,21 @@ The control signal is a vector with the velocity of each of the joints of the
 robot, and the reward is based on the current distance to the target position.
 """
 
+from .spaces import Box
+
 
 class Reach:
-	"""Reach task."""
+	"""
+	Reach task.
+
+	Attributes
+	----------
+	action_space
+		Space containing all the possible actions for this environment.
+	"""
 
 	def __init__(self):
-		pass
+		self.action_space = Box([0], [1])
 
 	def close(self):
 		"""Close connection to simulator."""
@@ -49,5 +58,7 @@ class Reach:
 		reset : bool
 			True if the episode ended in this timestep. The user must call the `reset`
 			method after this happens.
+		info
+			This return value is always None.
 		"""
-		pass
+		return None, 0, False, None
