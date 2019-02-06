@@ -27,12 +27,10 @@ def make(specs):
 		import gym
 		env = gym.make(specs['name'])
 	except ImportError:
-		print("Package 'gym' is not installed.")
-		raise
+		exit("Package 'gym' is not installed.")
 	except gym.error.UnregisteredEnv:
 		msg = 'No environment with name {} was found.'
-		print(msg.format(specs['name']))
-		raise
+		exit(msg.format(specs['name']))
 	return env
 
 
