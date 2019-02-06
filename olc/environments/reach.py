@@ -10,6 +10,8 @@ robot, and the reward is based on the current distance to the target position.
 
 from .spaces import Box
 
+from .simulation import Simulation
+
 
 class Reach:
 	"""
@@ -23,6 +25,7 @@ class Reach:
 
 	def __init__(self):
 		self.action_space = Box([0], [1])
+		self.sim = Simulation(None)
 
 	def close(self):
 		"""Close connection to simulator."""
