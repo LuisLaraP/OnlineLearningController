@@ -31,3 +31,29 @@ def getDefaults(id):
 	with pkg_resources.resource_stream(sections[0], 'data/'+sections[1]) as file:
 		settings = json.load(file)
 	return settings
+
+
+def merge(a, b):
+	"""
+	Merge two settings files.
+
+	The returned object will have all keys present in object `a` and object `b`.
+	However, if both objects have the same key, the value in object `b` takes
+	precedence. If there are settings objects inside any of the arguments, they
+	will be merged as well.
+
+	Parameters
+	----------
+	a, b : dict
+		Objects to merge.
+
+	Returns
+	-------
+	merged : dict
+		Merged object.
+	"""
+	merged = {**a, **b}
+	for key, value in a.items():
+		if isinstance(value, dict) and isinstance(b[key], dict):
+			merged[key] = merge(value, b[key])
+	return merged
