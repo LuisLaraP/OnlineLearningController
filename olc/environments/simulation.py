@@ -2,7 +2,7 @@
 
 import vrep
 
-from olc.settings import getDefaults
+from olc.settings import getDefaults, merge
 
 
 class Simulation:
@@ -17,6 +17,7 @@ class Simulation:
 
 	def __init__(self, settings):
 		self.settings = getDefaults(__name__ + ':simulation_defaults.json')
+		self.settings = merge(self.settings, settings)
 		self.id = vrep.simxStart(
 			self.settings['connection_address'],
 			self.settings['connection_port'],
@@ -26,8 +27,7 @@ class Simulation:
 			self.settings['comm_cycle']
 		)
 		if self.id == -1:
-			print('Connection to V-REP failed.')
-			exit(1)
+			exit('Connection to V-REP failed.')
 
 	def close(self):
 		"""Stop any running simulation and close connection to V-REP."""

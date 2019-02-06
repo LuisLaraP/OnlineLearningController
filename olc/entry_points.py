@@ -21,7 +21,8 @@ def olc():
 		specs = json.load(specsFile)
 	try:
 		environment = envs.make(specs['environment'])
-	except:  # noqa: E722
+	except BaseException as e:
+		print('Error: {}'.format(e))
 		exit(1)
 	controller = Controller(environment)
 	controller.run(specs['steps'])

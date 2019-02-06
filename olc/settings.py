@@ -52,8 +52,12 @@ def merge(a, b):
 	merged : dict
 		Merged object.
 	"""
+	if a is None:
+		return b
+	if b is None:
+		return a
 	merged = {**a, **b}
 	for key, value in a.items():
-		if isinstance(value, dict) and isinstance(b[key], dict):
+		if isinstance(value, dict) and key in b and isinstance(b[key], dict):
 			merged[key] = merge(value, b[key])
 	return merged

@@ -8,8 +8,8 @@ The control signal is a vector with the velocity of each of the joints of the
 robot, and the reward is based on the current distance to the target position.
 """
 
+from olc.settings import getDefaults, merge
 from .spaces import Box
-
 from .simulation import Simulation
 
 
@@ -17,15 +17,22 @@ class Reach:
 	"""
 	Reach task.
 
+	Parameters
+	----------
+	settings : dict
+		Custom settings.
+
 	Attributes
 	----------
 	action_space
 		Space containing all the possible actions for this environment.
 	"""
 
-	def __init__(self):
+	def __init__(self, settings):
+		self.settings = getDefaults(__name__ + ':reach_defaults.json')
+		self.settings = merge(self.settings, settings)
+		self.sim = Simulation(self.settings['simulation'])
 		self.action_space = Box([0], [1])
-		self.sim = Simulation(None)
 
 	def close(self):
 		"""Close connection to simulator."""
