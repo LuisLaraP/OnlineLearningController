@@ -36,7 +36,7 @@ class Reach:
 
 	def close(self):
 		"""Close connection to simulator."""
-		pass
+		self.sim.close()
 
 	def render(self):
 		"""
@@ -48,7 +48,8 @@ class Reach:
 
 	def reset(self):
 		"""Reset simulation."""
-		pass
+		self.sim.stop()
+		self.sim.start()
 
 	def step(self, action):
 		"""

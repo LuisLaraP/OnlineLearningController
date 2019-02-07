@@ -28,7 +28,29 @@ class Simulation:
 		)
 		if self.id == -1:
 			exit('Connection to V-REP failed.')
+		self.running = False
 
 	def close(self):
 		"""Stop any running simulation and close connection to V-REP."""
+		self.stop()
 		vrep.simxFinish(self.id)
+
+	def start(self):
+		"""
+		Start the simulation.
+
+		If there is already a simulation running, this method does nothing.
+		"""
+		if not self.running:
+			vrep.simxStartSimulation(self.id, vrep.simx_opmode_blocking)
+		self.running = True
+
+	def stop(self):
+		"""
+		Stop the simulation.
+
+		This method does nothing if there is no simulation running.
+		"""
+		if self.running:
+			vrep.simxStopSimulation(self.id, vrep.simx_opmode_blocking)
+		self.running = False

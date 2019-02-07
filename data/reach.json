@@ -1,6 +1,16 @@
 {
 	"steps": 100,
 	"environment": {
-		"name": "Reach"
+		"name": "Reach",
+		"robot": {
+			"joints": [
+				"KR5arcHW_joint1",
+				"KR5arcHW_joint2",
+				"KR5arcHW_joint3",
+				"KR5arcHW_joint4",
+				"KR5arcHW_joint5",
+				"KR5arcHW_joint6"
+			]
+		}
 	}
 }
