@@ -1,3 +1,9 @@
 {
-	"simulation": {}
+	"simulation": {},
+	"robot": {
+		"task-objects": [
+			"Error",
+			"Reference"
+		]
+	}
 }

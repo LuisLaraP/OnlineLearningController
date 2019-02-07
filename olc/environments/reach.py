@@ -31,7 +31,7 @@ class Reach:
 	def __init__(self, settings):
 		self.settings = getDefaults(__name__ + ':reach_defaults.json')
 		self.settings = merge(self.settings, settings)
-		self.sim = Simulation(self.settings['simulation'])
+		self.sim = Simulation(self.settings['simulation'], self.settings['robot'])
 		self.action_space = Box([0], [1])
 
 	def close(self):

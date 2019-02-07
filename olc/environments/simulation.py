@@ -13,9 +13,11 @@ class Simulation:
 	----------
 	settings : dict
 		Connection settings.
+	robot : dict
+		Robot specs.
 	"""
 
-	def __init__(self, settings):
+	def __init__(self, settings, robot):
 		self.settings = getDefaults(__name__ + ':simulation_defaults.json')
 		self.settings = merge(self.settings, settings)
 		self.id = vrep.simxStart(
@@ -29,6 +31,10 @@ class Simulation:
 		if self.id == -1:
 			exit('Connection to V-REP failed.')
 		self.running = False
+		self.joints = [vrep.simxGetObjectHandle(self.id, x, vrep.simx_opmode_blocking)
+			for x in robot['joints']]
+		self.extras = {x: vrep.simxGetObjectHandle(self.id, x, vrep.simx_opmode_blocking)
+			for x in robot['task-objects']}
 
 	def close(self):
 		"""Stop any running simulation and close connection to V-REP."""
