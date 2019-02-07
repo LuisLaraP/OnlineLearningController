@@ -72,4 +72,5 @@ class Reach:
 		info
 			This return value is always None.
 		"""
-		return None, 0, False, None
+		state = self.sim.jointPositions()
+		return state, 0, False, None
