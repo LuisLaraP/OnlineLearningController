@@ -34,7 +34,10 @@ class Reach:
 		self.settings = getDefaults(__name__ + ':reach_defaults.json')
 		self.settings = merge(self.settings, settings)
 		self.sim = Simulation(self.settings['simulation'], self.settings['robot'])
-		self.action_space = Box([0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1])
+		self.action_space = Box(
+			[-x for x in self.settings['robot']['max-velocities']],
+			self.settings['robot']['max-velocities']
+		)
 
 	def close(self):
 		"""Close connection to simulator."""

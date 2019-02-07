@@ -10,6 +10,14 @@
 				"KR5arcHW_joint4",
 				"KR5arcHW_joint5",
 				"KR5arcHW_joint6"
+			],
+			"max-velocities": [
+				156,
+				156,
+				227,
+				390,
+				390,
+				858
 			]
 		}
 	}
