@@ -31,8 +31,6 @@ class Simulation:
 		if self.id == -1:
 			exit('Connection to V-REP failed.')
 		self.running = False
-		self.extras = {x: vrep.simxGetObjectHandle(self.id, x, vrep.simx_opmode_blocking)
-			for x in robot['task-objects']}
 		self.joints = []
 		for j in robot['joints']:
 			_, handle = vrep.simxGetObjectHandle(self.id, j, vrep.simx_opmode_blocking)
