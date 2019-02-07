@@ -8,6 +8,8 @@ The control signal is a vector with the velocity of each of the joints of the
 robot, and the reward is based on the current distance to the target position.
 """
 
+import time
+
 from olc.settings import getDefaults, merge
 from .spaces import Box
 from .simulation import Simulation
@@ -73,5 +75,6 @@ class Reach:
 			This return value is always None.
 		"""
 		self.sim.setJointVelocities(action)
+		time.sleep(self.settings['timestep'])
 		state = self.sim.getJointPositions()
 		return state, 0, False, None
