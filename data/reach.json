@@ -11,6 +11,22 @@
 				"KR5arcHW_joint5",
 				"KR5arcHW_joint6"
 			],
+			"joint-min": [
+				-155,
+				-180,
+				-110,
+				-165,
+				-140,
+				-180
+			],
+			"joint-max": [
+				155,
+				65,
+				170,
+				165,
+				140,
+				180
+			],
 			"max-velocities": [
 				156,
 				156,

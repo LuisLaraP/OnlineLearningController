@@ -38,6 +38,10 @@ class Reach:
 			[-x for x in self.settings['robot']['max-velocities']],
 			self.settings['robot']['max-velocities']
 		)
+		self.observation_space = Box(
+			self.settings['robot']['joint-min'],
+			self.settings['robot']['joint-max']
+		)
 
 	def close(self):
 		"""Close connection to simulator."""
