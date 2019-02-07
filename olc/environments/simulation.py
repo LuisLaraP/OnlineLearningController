@@ -42,7 +42,7 @@ class Simulation:
 		self.stop()
 		vrep.simxFinish(self.id)
 
-	def jointPositions(self):
+	def getJointPositions(self):
 		"""
 		Get the current position of all joints.
 
@@ -56,6 +56,19 @@ class Simulation:
 			_, p = vrep.simxGetJointPosition(self.id, j, vrep.simx_opmode_buffer)
 			positions.append(p)
 		return positions
+
+	def setJointVelocities(self, vels):
+		"""
+		Set the target velocity for each joint.
+
+		Parameters
+		----------
+		vls : array-like
+			Vector containing the desired valocities.
+		"""
+		for i in range(len(self.joints)):
+			vrep.simxSetJointTargetVelocity(self.id, self.joints[i], vels[i],
+				vrep.simx_opmode_oneshot)
 
 	def start(self):
 		"""

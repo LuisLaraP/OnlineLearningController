@@ -32,7 +32,7 @@ class Reach:
 		self.settings = getDefaults(__name__ + ':reach_defaults.json')
 		self.settings = merge(self.settings, settings)
 		self.sim = Simulation(self.settings['simulation'], self.settings['robot'])
-		self.action_space = Box([0], [1])
+		self.action_space = Box([0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1])
 
 	def close(self):
 		"""Close connection to simulator."""
@@ -57,7 +57,7 @@ class Reach:
 
 		Parameters
 		----------
-		action : Numpy array
+		action : array-like
 			Action to execute in this timestep.
 
 		Returns
@@ -72,5 +72,6 @@ class Reach:
 		info
 			This return value is always None.
 		"""
-		state = self.sim.jointPositions()
+		self.sim.setJointVelocities(action)
+		state = self.sim.getJointPositions()
 		return state, 0, False, None
