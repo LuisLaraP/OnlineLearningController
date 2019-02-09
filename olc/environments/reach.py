@@ -42,8 +42,10 @@ class Reach:
 			[radians(x) for x in self.settings['robot']['max-velocities']]
 		)
 		self.observation_space = Box(
-			self.settings['robot']['joint-min'],
-			self.settings['robot']['joint-max']
+			[radians(x) for x in self.settings['robot']['joint-min']]
+			+ [0] * len(self.settings['robot']['max-velocities']),
+			[radians(x) for x in self.settings['robot']['joint-max']]
+			+ [radians(x) for x in self.settings['robot']['max-velocities']]
 		)
 
 	def close(self):
