@@ -38,6 +38,7 @@ class Simulation:
 			vrep.simxGetJointPosition(self.id, handle, vrep.simx_opmode_streaming)
 			vrep.simxGetObjectFloatParameter(self.id, handle,
 				vrep.sim_jointfloatparam_velocity, vrep.simx_opmode_streaming)
+		self.distances = {}
 
 	def close(self):
 		"""Stop any running simulation and close connection to V-REP."""
@@ -74,6 +75,41 @@ class Simulation:
 				vrep.sim_jointfloatparam_velocity, vrep.simx_opmode_buffer)
 			velocities.append(v)
 		return velocities
+
+	def readDistance(self, name):
+		"""
+		Get the value of a previously registered distance.
+
+		Parameters
+		----------
+		name : str
+			Name of the distance object.
+
+		Returns
+		-------
+		distance : float
+			Current distance value.
+
+		See Also
+		--------
+		registerDistanceObject : Register a new distance object.
+		"""
+		return vrep.simxReadDistance(self.id, self.distances[name],
+			vrep.simx_opmode_buffer)[1]
+
+	def registerDistanceObject(self, name):
+		"""
+		Register a distance object in the scene to read.
+
+		Parameters
+		----------
+		name : str
+			Name of the distance object.
+		"""
+		_, self.distances[name] = vrep.simxGetDistanceHandle(self.id, name,
+			vrep.simx_opmode_blocking)
+		vrep.simxReadDistance(self.id, self.distances[name],
+			vrep.simx_opmode_streaming)
 
 	def setJointVelocities(self, vels):
 		"""

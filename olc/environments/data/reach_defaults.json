@@ -1,4 +1,5 @@
 {
+	"error-object-name": "Error",
 	"timestep": 0.05,
 	"simulation": {}
 }

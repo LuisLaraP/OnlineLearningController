@@ -47,6 +47,7 @@ class Reach:
 			[radians(x) for x in self.settings['robot']['joint-max']]
 			+ [radians(x) for x in self.settings['robot']['max-velocities']]
 		)
+		self.sim.registerDistanceObject(self.settings['error-object-name'])
 
 	def close(self):
 		"""Close connection to simulator."""
@@ -90,5 +91,7 @@ class Reach:
 		time.sleep(self.settings['timestep'])
 		pos = self.sim.getJointPositions()
 		vel = self.sim.getJointVelocities()
+		error = self.sim.readDistance(self.settings['error-object-name'])
+		print(error)
 		state = np.concatenate((pos, vel))
 		return state, 0, False, None
