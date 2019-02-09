@@ -9,6 +9,7 @@ robot, and the reward is based on the current distance to the target position.
 """
 
 import time
+from math import radians
 
 import numpy as np
 
@@ -37,8 +38,8 @@ class Reach:
 		self.settings = merge(self.settings, settings)
 		self.sim = Simulation(self.settings['simulation'], self.settings['robot'])
 		self.action_space = Box(
-			[-x for x in self.settings['robot']['max-velocities']],
-			self.settings['robot']['max-velocities']
+			[-radians(x) for x in self.settings['robot']['max-velocities']],
+			[radians(x) for x in self.settings['robot']['max-velocities']]
 		)
 		self.observation_space = Box(
 			self.settings['robot']['joint-min'],
