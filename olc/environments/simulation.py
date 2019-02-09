@@ -36,6 +36,8 @@ class Simulation:
 			_, handle = vrep.simxGetObjectHandle(self.id, j, vrep.simx_opmode_blocking)
 			self.joints.append(handle)
 			vrep.simxGetJointPosition(self.id, handle, vrep.simx_opmode_streaming)
+			vrep.simxGetObjectFloatParameter(self.id, handle,
+				vrep.sim_jointfloatparam_velocity, vrep.simx_opmode_streaming)
 
 	def close(self):
 		"""Stop any running simulation and close connection to V-REP."""
@@ -56,6 +58,22 @@ class Simulation:
 			_, p = vrep.simxGetJointPosition(self.id, j, vrep.simx_opmode_buffer)
 			positions.append(p)
 		return positions
+
+	def getJointVelocities(self):
+		"""
+		Get the current velocity of all joints.
+
+		Returns
+		-------
+		velocities : array-like
+			Vector containing the joint velocities.
+		"""
+		velocities = []
+		for j in self.joints:
+			_, v = vrep.simxGetObjectFloatParameter(self.id, j,
+				vrep.sim_jointfloatparam_velocity, vrep.simx_opmode_buffer)
+			velocities.append(v)
+		return velocities
 
 	def setJointVelocities(self, vels):
 		"""

@@ -10,6 +10,8 @@ robot, and the reward is based on the current distance to the target position.
 
 import time
 
+import numpy as np
+
 from olc.settings import getDefaults, merge
 from .spaces import Box
 from .simulation import Simulation
@@ -83,5 +85,7 @@ class Reach:
 		"""
 		self.sim.setJointVelocities(action)
 		time.sleep(self.settings['timestep'])
-		state = self.sim.getJointPositions()
+		pos = self.sim.getJointPositions()
+		vel = self.sim.getJointVelocities()
+		state = np.concatenate((pos, vel))
 		return state, 0, False, None
