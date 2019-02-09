@@ -92,6 +92,9 @@ class Reach:
 		pos = self.sim.getJointPositions()
 		vel = self.sim.getJointVelocities()
 		error = self.sim.readDistance(self.settings['error-object-name'])
-		print(error)
 		state = np.concatenate((pos, vel))
-		return state, 0, False, None
+		if error <= self.settings['threshold-distance']:
+			reset = True
+		else:
+			reset = False
+		return state, 0, reset, None
