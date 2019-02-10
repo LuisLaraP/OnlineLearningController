@@ -48,6 +48,7 @@ class Reach:
 			+ [radians(x) for x in self.settings['robot']['max-velocities']]
 		)
 		self.sim.registerDistanceObject(self.settings['error-object-name'])
+		self.lastError = self.sim.readDistance(self.settings['error-object-name'])
 
 	def close(self):
 		"""Close connection to simulator."""
@@ -92,9 +93,11 @@ class Reach:
 		pos = self.sim.getJointPositions()
 		vel = self.sim.getJointVelocities()
 		error = self.sim.readDistance(self.settings['error-object-name'])
+		reward = self.lastError - error
+		self.lastError = error
 		state = np.concatenate((pos, vel))
 		if error <= self.settings['threshold-distance']:
 			reset = True
 		else:
 			reset = False
-		return state, 0, reset, None
+		return state, reward, reset, None
