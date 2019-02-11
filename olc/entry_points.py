@@ -19,11 +19,7 @@ def olc():
 	args = parser.parse_args()
 	with open(args.filename, 'r') as specsFile:
 		specs = json.load(specsFile)
-	try:
-		environment = envs.make(specs['environment'])
-	except BaseException as e:
-		print('Error: {}'.format(e))
-		exit(1)
+	environment = envs.make(specs['environment'])
 	controller = Controller(environment)
 	controller.run(specs['steps'])
 	environment.close()
