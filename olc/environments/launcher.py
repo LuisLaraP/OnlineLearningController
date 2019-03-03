@@ -1,5 +1,3 @@
-"""Launcher of environment instances."""
-
 _registry = {}
 
 

@@ -1,5 +1,3 @@
-"""An object for managing a connection to V-REP."""
-
 import vrep
 
 from olc.settings import getDefaults, merge
@@ -41,7 +39,6 @@ class Simulation:
 		self.distances = {}
 
 	def close(self):
-		"""Stop any running simulation and close connection to V-REP."""
 		self.stop()
 		vrep.simxFinish(self.id)
 
@@ -98,48 +95,22 @@ class Simulation:
 			vrep.simx_opmode_buffer)[1]
 
 	def registerDistanceObject(self, name):
-		"""
-		Register a distance object in the scene to read.
-
-		Parameters
-		----------
-		name : str
-			Name of the distance object.
-		"""
 		_, self.distances[name] = vrep.simxGetDistanceHandle(self.id, name,
 			vrep.simx_opmode_blocking)
 		vrep.simxReadDistance(self.id, self.distances[name],
 			vrep.simx_opmode_streaming)
 
 	def setJointVelocities(self, vels):
-		"""
-		Set the target velocity for each joint.
-
-		Parameters
-		----------
-		vls : array-like
-			Vector containing the desired valocities.
-		"""
 		for i in range(len(self.joints)):
 			vrep.simxSetJointTargetVelocity(self.id, self.joints[i], vels[i],
 				vrep.simx_opmode_oneshot)
 
 	def start(self):
-		"""
-		Start the simulation.
-
-		If there is already a simulation running, this method does nothing.
-		"""
 		if not self.running:
 			vrep.simxStartSimulation(self.id, vrep.simx_opmode_blocking)
 		self.running = True
 
 	def stop(self):
-		"""
-		Stop the simulation.
-
-		This method does nothing if there is no simulation running.
-		"""
 		if self.running:
 			vrep.simxStopSimulation(self.id, vrep.simx_opmode_blocking)
 		self.running = False

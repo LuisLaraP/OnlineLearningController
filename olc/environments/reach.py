@@ -51,19 +51,12 @@ class Reach:
 		self.lastError = self.sim.readDistance(self.settings['error-object-name'])
 
 	def close(self):
-		"""Close connection to simulator."""
 		self.sim.close()
 
 	def render(self):
-		"""
-		Do nothing.
-
-		Method kept for compatibility with OpenAI Gym's environment API.
-		"""
 		pass
 
 	def reset(self):
-		"""Reset simulation."""
 		self.sim.stop()
 		self.sim.start()
 

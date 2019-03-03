@@ -1,5 +1,3 @@
-"""Definitions for all entry points."""
-
 import argparse
 import json
 
@@ -8,7 +6,6 @@ from .controller import Controller
 
 
 def olc():
-	"""Run an experiment using a specification file."""
 	parser = argparse.ArgumentParser(
 		description='Run an experiment using a specification file.'
 	)

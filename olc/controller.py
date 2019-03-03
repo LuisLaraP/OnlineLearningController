@@ -1,6 +1,3 @@
-"""Abstraction of the controller."""
-
-
 class Controller:
 	"""
 	Abstraction of the controller.
