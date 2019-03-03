@@ -1,8 +1,11 @@
 import argparse
+import datetime
 import json
+import os.path
 
 import olc.environments as envs
-from .controller import Controller
+from olc.controller import Controller
+from olc.logger import Logger
 
 
 def olc():
@@ -17,6 +20,10 @@ def olc():
 	with open(args.filename, 'r') as specsFile:
 		specs = json.load(specsFile)
 	environment = envs.make(specs['environment'])
+	time = datetime.datetime.now().time()
+	logFile = os.path.splitext(os.path.basename(args.filename))[0]
+	logFile = 'logs/{}-{:%H:%M}.log'.format(logFile, time)
+	logger = Logger(logFile)
 	controller = Controller(environment)
 	controller.run(specs['steps'])
 	environment.close()
