@@ -13,8 +13,10 @@ class Controller:
 		Current environment class.
 	"""
 
-	def __init__(self, environment):
+	def __init__(self, environment, logger):
 		self.env = environment
+		self.logger = logger
+		self.logger.setNames(['Error'])
 
 	def run(self, steps):
 		"""
