@@ -23,7 +23,7 @@ def olc():
 	time = datetime.datetime.now().time()
 	logFile = os.path.splitext(os.path.basename(args.filename))[0]
 	logFile = 'logs/{}-{:%H:%M}.log'.format(logFile, time)
-	logger = Logger(logFile)
+	logger = Logger(logFile, [])
 	controller = Controller(environment)
 	controller.run(specs['steps'])
 	environment.close()
