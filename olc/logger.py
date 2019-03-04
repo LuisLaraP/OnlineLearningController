@@ -6,5 +6,9 @@ class Logger:
 	def close(self):
 		self.file.close()
 
+	def log(self, values):
+		strs = [str(x) for x in values]
+		self.file.write('\t'.join(strs) + '\n')
+
 	def setNames(self, names):
 		self.file.write('\t'.join(names) + '\n')

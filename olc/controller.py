@@ -16,7 +16,7 @@ class Controller:
 	def __init__(self, environment, logger):
 		self.env = environment
 		self.logger = logger
-		self.logger.setNames(['Error'])
+		self.logger.setNames(['Reward'])
 
 	def run(self, steps):
 		"""
@@ -38,3 +38,4 @@ class Controller:
 			self.env.render()
 			action = self.env.action_space.sample()
 			state, reward, reset, info = self.env.step(action)
+			self.logger.log([reward])
