@@ -45,7 +45,7 @@ class Logger:
 			if min(self.buffers[i]) < self.limits[i][0]:
 				self.limits[i][0] = min(self.buffers[i])
 				self.axes[i].set_ylim(self.limits[i])
-			if max(self.buffers[i]) < self.limits[i][1]:
+			if max(self.buffers[i]) > self.limits[i][1]:
 				self.limits[i][1] = max(self.buffers[i])
 				self.axes[i].set_ylim(self.limits[i])
 			plt.pause(0.0001)
