@@ -25,6 +25,6 @@ def olc():
 	logFile = 'logs/{}-{:%H:%M}.log'.format(logFile, time)
 	logger = Logger(logFile, visualize=['reward'])
 	controller = Controller(environment, logger)
-	input('Press any ENTER to start.\n')
+	input('Press ENTER to start.\n')
 	controller.run(specs['steps'])
 	environment.close()
