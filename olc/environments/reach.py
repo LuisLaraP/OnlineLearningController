@@ -48,7 +48,7 @@ class Reach:
 			+ [radians(x) for x in self.settings['robot']['max-velocities']]
 		)
 		self.sim.registerDistanceObject(self.settings['error-object-name'])
-		self.lastError = self.sim.readDistance(self.settings['error-object-name'])
+		self.lastError = None
 
 	def close(self):
 		self.sim.close()
@@ -59,6 +59,7 @@ class Reach:
 	def reset(self):
 		self.sim.stop()
 		self.sim.start()
+		self.lastError = self.sim.readDistance(self.settings['error-object-name'])
 
 	def step(self, action):
 		"""
