@@ -59,7 +59,9 @@ class Reach:
 	def reset(self):
 		self.sim.stop()
 		self.sim.start()
+		time.sleep(0.2)
 		self.lastError = self.sim.readDistance(self.settings['error-object-name'])
+		print(self.lastError)
 
 	def step(self, action):
 		"""
