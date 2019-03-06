@@ -1,5 +1,6 @@
 """Storage for previously seen transitions."""
 
+import collections
 import random
 
 
@@ -13,12 +14,11 @@ class ReplayBuffer:
 	"""
 
 	def __init__(self, size):
-		self.size = size
-		self.iState = []
-		self.action = []
-		self.reward = []
-		self.fState = []
-		self.terminal = []
+		self.iState = collections.deque(maxlen=size)
+		self.action = collections.deque(maxlen=size)
+		self.reward = collections.deque(maxlen=size)
+		self.fState = collections.deque(maxlen=size)
+		self.terminal = collections.deque(maxlen=size)
 
 	def storeTransition(self, si, a, r, sf, t):
 		"""Add the given transition to the buffer.
@@ -38,12 +38,6 @@ class ReplayBuffer:
 		t : bool
 			True if the given transition was the last in its episode.
 		"""
-		if len(self.action) == self.size:
-			self.iState.pop(0)
-			self.action.pop(0)
-			self.reward.pop(0)
-			self.fState.pop(0)
-			self.terminal.pop(0)
 		self.iState.append(si)
 		self.action.append(a)
 		self.reward.append(r)
