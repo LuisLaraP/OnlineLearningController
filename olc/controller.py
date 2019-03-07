@@ -1,38 +1,21 @@
 class Controller:
-	"""
-	Abstraction of the controller.
 
-	Parameters
-	----------
-	environment
-		Class compatible with OpenAI Gym's API to run the controller on.
-
-	Attributes
-	----------
-	env
-		Current environment class.
-	"""
-
-	def __init__(self, environment, logger):
+	def __init__(self, settings, environment, logger):
+		self.settings = settings
 		self.env = environment
 		self.logger = logger
 		self.logger.setNames(['Reward'])
 
-	def run(self, steps):
+	def run(self):
 		"""
 		Run an experiment on the environment.
 
-		The simulation will run for exactly the amount of steps specified. If
-		an episode ends before reaching the target number of steps, the
+		The simulation will run for exactly the amount of steps specified in the
+		settings. If an episode ends before reaching the target number of steps, the
 		environment is reset and the experiment continues.
-
-		Parameters
-		----------
-		steps : int
-			Amount of steps to perform.
 		"""
 		reset = True
-		for _ in range(steps):
+		for _ in range(self.settings['steps']):
 			if reset:
 				state = self.env.reset()
 			self.env.render()

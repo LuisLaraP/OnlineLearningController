@@ -55,9 +55,9 @@ def olc():
 	logger = Logger(logFile, visualize=['reward'])
 
 	# Create controller
-	controller = Controller(environment, logger)
+	controller = Controller(params, environment, logger)
 
 	# Run
 	input('Press ENTER to start.\n')
-	controller.run(params['steps'])
+	controller.run()
 	environment.close()
