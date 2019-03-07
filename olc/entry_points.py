@@ -14,8 +14,8 @@ def olc():
 		description='Run an experiment.'
 	)
 	parser.add_argument(
-		'filename',
-		help='path to the specifications file to be used.'
+		'params',
+		help='path to the parameters file.'
 	)
 	parser.add_argument(
 		'task',
@@ -29,8 +29,8 @@ def olc():
 	args = parser.parse_args()
 
 	# Read settings
-	with open(args.filename, 'r') as specsFile:
-		specs = json.load(specsFile)
+	with open(args.params, 'r') as paramsFile:
+		params = json.load(paramsFile)
 	with open(args.task, 'r') as taskFile:
 		task = json.load(taskFile)
 	if args.robot is not None:
@@ -50,7 +50,7 @@ def olc():
 
 	# Create logger
 	time = datetime.datetime.now().time()
-	logFile = os.path.splitext(os.path.basename(args.filename))[0]
+	logFile = os.path.splitext(os.path.basename(args.task))[0]
 	logFile = 'logs/{}-{:%H:%M}.log'.format(logFile, time)
 	logger = Logger(logFile, visualize=['reward'])
 
@@ -59,5 +59,5 @@ def olc():
 
 	# Run
 	input('Press ENTER to start.\n')
-	controller.run(specs['steps'])
+	controller.run(params['steps'])
 	environment.close()
