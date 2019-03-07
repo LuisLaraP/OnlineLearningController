@@ -1,6 +1,3 @@
 {
-	"steps": 100,
-	"environment": {
-		"name": "Reach"
-	}
+	"steps": 100
 }

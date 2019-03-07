@@ -18,6 +18,10 @@ def olc():
 		help='path to the specifications file to be used.'
 	)
 	parser.add_argument(
+		'task',
+		help='path to the specifications file for the task.'
+	)
+	parser.add_argument(
 		'robot',
 		nargs='?',
 		help='path to the specifications file for the robot.'
@@ -27,6 +31,8 @@ def olc():
 	# Read settings
 	with open(args.filename, 'r') as specsFile:
 		specs = json.load(specsFile)
+	with open(args.task, 'r') as taskFile:
+		task = json.load(taskFile)
 	if args.robot is not None:
 		with open(args.robot, 'r') as robotFile:
 			robot = json.load(robotFile)
@@ -40,7 +46,7 @@ def olc():
 		simulator = None
 
 	# Create environment
-	environment = envs.make(specs['environment'], simulator)
+	environment = envs.make(task, simulator)
 
 	# Create logger
 	time = datetime.datetime.now().time()
