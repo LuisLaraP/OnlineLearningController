@@ -1,40 +1,6 @@
 {
 	"steps": 100,
 	"environment": {
-		"name": "Reach",
-		"robot": {
-			"joints": [
-				"KR5arcHW_joint1",
-				"KR5arcHW_joint2",
-				"KR5arcHW_joint3",
-				"KR5arcHW_joint4",
-				"KR5arcHW_joint5",
-				"KR5arcHW_joint6"
-			],
-			"joint-min": [
-				-155,
-				-180,
-				-110,
-				-165,
-				-140,
-				-180
-			],
-			"joint-max": [
-				155,
-				65,
-				170,
-				165,
-				140,
-				180
-			],
-			"max-velocities": [
-				156,
-				156,
-				227,
-				390,
-				390,
-				858
-			]
-		}
+		"name": "Reach"
 	}
 }

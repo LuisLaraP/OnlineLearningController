@@ -15,7 +15,6 @@ import numpy as np
 
 from olc.settings import getDefaults, merge
 from .spaces import Box
-from .simulation import Simulation
 
 
 class Reach:
@@ -33,19 +32,19 @@ class Reach:
 		Space containing all the possible actions for this environment.
 	"""
 
-	def __init__(self, settings):
+	def __init__(self, settings, simulation):
 		self.settings = getDefaults(__name__ + ':reach_defaults.json')
 		self.settings = merge(self.settings, settings)
-		self.sim = Simulation(self.settings['robot'])
+		self.sim = simulation
 		self.action_space = Box(
-			[-radians(x) for x in self.settings['robot']['max-velocities']],
-			[radians(x) for x in self.settings['robot']['max-velocities']]
+			[-radians(x) for x in self.sim.robot['max-velocities']],
+			[radians(x) for x in self.sim.robot['max-velocities']]
 		)
 		self.observation_space = Box(
-			[radians(x) for x in self.settings['robot']['joint-min']]
-			+ [0] * len(self.settings['robot']['max-velocities']),
-			[radians(x) for x in self.settings['robot']['joint-max']]
-			+ [radians(x) for x in self.settings['robot']['max-velocities']]
+			[radians(x) for x in self.sim.robot['joint-min']]
+			+ [0] * len(self.sim.robot['max-velocities']),
+			[radians(x) for x in self.sim.robot['joint-max']]
+			+ [radians(x) for x in self.sim.robot['max-velocities']]
 		)
 		self.sim.registerDistanceObject(self.settings['error-object-name'])
 		self.lastError = None

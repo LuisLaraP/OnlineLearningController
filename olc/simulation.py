@@ -15,6 +15,7 @@ class Simulation:
 		self.id = vrep.simxStart("127.0.0.1", 19997, True, True, 5000, 5)
 		if self.id == -1:
 			exit('Connection to V-REP failed.')
+		self.robot = robot
 		self.running = False
 		self.joints = []
 		for j in robot['joints']:

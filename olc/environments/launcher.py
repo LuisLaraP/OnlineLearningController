@@ -1,7 +1,7 @@
 _registry = {}
 
 
-def make(specs):
+def make(settings, simulation):
 	"""
 	Create a new instance of the given environment.
 
@@ -19,16 +19,16 @@ def make(specs):
 	env
 		Instance of the environment `name`.
 	"""
-	if specs['name'] in _registry:
-		return _registry[specs['name']](specs)
+	if settings['name'] in _registry:
+		return _registry[settings['name']](settings, simulation)
 	try:
 		import gym
-		env = gym.make(specs['name'])
+		env = gym.make(settings['name'])
 	except ImportError:
 		exit("Package 'gym' is not installed.")
 	except gym.error.UnregisteredEnv:
 		msg = 'No environment with name {} was found.'
-		exit(msg.format(specs['name']))
+		exit(msg.format(settings['name']))
 	return env
 
 
