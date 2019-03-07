@@ -36,7 +36,7 @@ class Reach:
 	def __init__(self, settings):
 		self.settings = getDefaults(__name__ + ':reach_defaults.json')
 		self.settings = merge(self.settings, settings)
-		self.sim = Simulation(self.settings['simulation'], self.settings['robot'])
+		self.sim = Simulation(self.settings['robot'])
 		self.action_space = Box(
 			[-radians(x) for x in self.settings['robot']['max-velocities']],
 			[radians(x) for x in self.settings['robot']['max-velocities']]
@@ -61,7 +61,6 @@ class Reach:
 		self.sim.start()
 		time.sleep(0.2)
 		self.lastError = self.sim.readDistance(self.settings['error-object-name'])
-		print(self.lastError)
 
 	def step(self, action):
 		"""

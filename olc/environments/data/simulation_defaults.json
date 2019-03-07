@@ -1,8 +1,0 @@
-{
-	"connection_address": "127.0.0.1",
-	"connection_port": 19997,
-	"wait_until_connected": true,
-	"reconnect": true,
-	"timeout": 5000,
-	"comm_cycle": 5
-}

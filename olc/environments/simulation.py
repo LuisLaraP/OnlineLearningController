@@ -1,7 +1,5 @@
 import vrep
 
-from olc.settings import getDefaults, merge
-
 
 class Simulation:
 	"""
@@ -9,23 +7,12 @@ class Simulation:
 
 	Parameters
 	----------
-	settings : dict
-		Connection settings.
 	robot : dict
 		Robot specs.
 	"""
 
-	def __init__(self, settings, robot):
-		self.settings = getDefaults(__name__ + ':simulation_defaults.json')
-		self.settings = merge(self.settings, settings)
-		self.id = vrep.simxStart(
-			self.settings['connection_address'],
-			self.settings['connection_port'],
-			self.settings['wait_until_connected'],
-			self.settings['reconnect'],
-			self.settings['timeout'],
-			self.settings['comm_cycle']
-		)
+	def __init__(self, robot):
+		self.id = vrep.simxStart("127.0.0.1", 19997, True, True, 5000, 5)
 		if self.id == -1:
 			exit('Connection to V-REP failed.')
 		self.running = False
