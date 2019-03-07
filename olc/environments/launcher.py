@@ -1,7 +1,7 @@
 _registry = {}
 
 
-def make(settings, simulation):
+def make(settings, simulation=None):
 	"""
 	Create a new instance of the given environment.
 
@@ -20,6 +20,8 @@ def make(settings, simulation):
 		Instance of the environment `name`.
 	"""
 	if settings['name'] in _registry:
+		if simulation is None:
+			exit('When using a built-in environment, a robot file must be specified.')
 		return _registry[settings['name']](settings, simulation)
 	try:
 		import gym

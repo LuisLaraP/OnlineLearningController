@@ -19,6 +19,7 @@ def olc():
 	)
 	parser.add_argument(
 		'robot',
+		nargs='?',
 		help='path to the specifications file for the robot.'
 	)
 	args = parser.parse_args()
@@ -26,11 +27,17 @@ def olc():
 	# Read settings
 	with open(args.filename, 'r') as specsFile:
 		specs = json.load(specsFile)
-	with open(args.robot, 'r') as robotFile:
-		robot = json.load(robotFile)
+	if args.robot is not None:
+		with open(args.robot, 'r') as robotFile:
+			robot = json.load(robotFile)
+	else:
+		robot = None
 
 	# Connect to simulator
-	simulator = Simulation(robot)
+	if robot is not None:
+		simulator = Simulation(robot)
+	else:
+		simulator = None
 
 	# Create environment
 	environment = envs.make(specs['environment'], simulator)
