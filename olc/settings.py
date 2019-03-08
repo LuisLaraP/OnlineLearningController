@@ -11,24 +11,24 @@ import json
 import pkg_resources
 
 
-def getDefaults(id):
+def getDefaults(package, id):
 	"""
 	Get the default settings for the given object.
 
 	Parameters
 	----------
+	package: str
+		Name of the package where the defaults file is located.
 	id : str
-		Identifier of the object for which to get defaults. It must be of the form
-		`package:file`, where `package` is the full name of the package where the
-		defaults were defined and `file` is the filename of the specification.
+		Identifier of the object for which to get defaults.
 
 	Returns
 	-------
 	settings : dict
 		Settings object with the default values.
 	"""
-	sections = [x.strip() for x in id.split(':')]
-	with pkg_resources.resource_stream(sections[0], 'data/'+sections[1]) as file:
+	filename = 'data/{}_defaults.json'.format(id)
+	with pkg_resources.resource_stream(package, filename) as file:
 		settings = json.load(file)
 	return settings
 

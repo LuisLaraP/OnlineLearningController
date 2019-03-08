@@ -24,8 +24,7 @@ def make(settings, simulation=None):
 	if settings['name'] in _registry:
 		if simulation is None:
 			exit('When using a built-in environment, a robot file must be specified.')
-		taskId = ':{}_defaults.json'.format(settings['name']).lower()
-		defs = getDefaults(__name__ + taskId)
+		defs = getDefaults(__name__, settings['name'].lower())
 		mergedSettings = merge(defs, settings)
 		return _registry[settings['name']](mergedSettings, simulation)
 	try:

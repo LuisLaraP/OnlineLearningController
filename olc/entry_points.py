@@ -56,7 +56,7 @@ def olc():
 	logger = Logger(logFile, visualize=['reward'])
 
 	# Create controller
-	defParams = getDefaults(__name__ + ':params_defaults.json')
+	defParams = getDefaults(__name__, 'params')
 	mergedParams = merge(defParams, params)
 	controller = Controller(mergedParams, environment, logger)
 
