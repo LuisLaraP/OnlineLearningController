@@ -6,6 +6,7 @@ import os.path
 import olc.environments as envs
 from olc.controller import Controller
 from olc.logger import Logger
+from olc.settings import getDefaults, merge
 from olc.simulation import Simulation
 
 
@@ -55,7 +56,9 @@ def olc():
 	logger = Logger(logFile, visualize=['reward'])
 
 	# Create controller
-	controller = Controller(params, environment, logger)
+	defParams = getDefaults(__name__ + ':params_defaults.json')
+	mergedParams = merge(defParams, params)
+	controller = Controller(mergedParams, environment, logger)
 
 	# Run
 	input('Press ENTER to start.\n')
