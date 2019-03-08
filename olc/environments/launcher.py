@@ -1,3 +1,5 @@
+from olc.settings import getDefaults, merge
+
 _registry = {}
 
 
@@ -22,7 +24,10 @@ def make(settings, simulation=None):
 	if settings['name'] in _registry:
 		if simulation is None:
 			exit('When using a built-in environment, a robot file must be specified.')
-		return _registry[settings['name']](settings, simulation)
+		taskId = ':{}_defaults.json'.format(settings['name']).lower()
+		defs = getDefaults(__name__ + taskId)
+		mergedSettings = merge(defs, settings)
+		return _registry[settings['name']](mergedSettings, simulation)
 	try:
 		import gym
 		env = gym.make(settings['name'])

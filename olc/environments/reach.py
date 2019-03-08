@@ -13,7 +13,6 @@ from math import radians
 
 import numpy as np
 
-from olc.settings import getDefaults, merge
 from .spaces import Box
 
 
@@ -33,8 +32,7 @@ class Reach:
 	"""
 
 	def __init__(self, settings, simulation):
-		self.settings = getDefaults(__name__ + ':reach_defaults.json')
-		self.settings = merge(self.settings, settings)
+		self.settings = settings
 		self.sim = simulation
 		self.action_space = Box(
 			[-radians(x) for x in self.sim.robot['max-velocities']],
