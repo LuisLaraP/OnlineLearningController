@@ -1,0 +1,14 @@
+[
+	{
+		"type": "dense",
+		"units": 64
+	},
+	{
+		"type": "dense",
+		"units": 64
+	},
+	{
+		"type": "dense",
+		"units": 64
+	}
+]
