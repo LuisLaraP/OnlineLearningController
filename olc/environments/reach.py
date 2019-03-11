@@ -50,9 +50,6 @@ class Reach:
 	def close(self):
 		self.sim.close()
 
-	def render(self):
-		pass
-
 	def reset(self):
 		self.sim.stop()
 		self.sim.start()

@@ -22,7 +22,6 @@ class Controller:
 		for _ in range(self.settings['steps']):
 			if reset:
 				state = self.env.reset()
-			self.env.render()
 			action = self.env.action_space.sample()
 			state, reward, reset, info = self.env.step(action)
 			self.logger.log([reward])
