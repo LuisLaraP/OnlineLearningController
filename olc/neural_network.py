@@ -8,5 +8,4 @@ def buildNetwork(name, specs):
 		for layer in specs:
 			if layer['type'] == 'dense':
 				model.add(layers.Dense(layer['units']))
-	model.compile()
 	return model

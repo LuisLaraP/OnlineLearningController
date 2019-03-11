@@ -3,12 +3,12 @@ from olc.neural_network import buildNetwork
 
 class Controller:
 
-	def __init__(self, settings, environment, logger):
+	def __init__(self, settings, network, environment, logger):
 		self.settings = settings
 		self.env = environment
 		self.logger = logger
 		self.logger.setNames(['Reward'])
-		self.q = buildNetwork('Q', None)
+		self.q = buildNetwork('Q', network)
 
 	def run(self):
 		"""
