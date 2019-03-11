@@ -42,13 +42,8 @@ def olc():
 	with open(args.robot, 'r') as robotFile:
 		robot = json.load(robotFile)
 
-	# Connect to simulator
-	if robot is not None:
-		simulator = Simulation(robot)
-	else:
-		simulator = None
-
 	# Create environment
+	simulator = Simulation(robot)
 	environment = envs.make(task, simulator)
 
 	# Create logger
