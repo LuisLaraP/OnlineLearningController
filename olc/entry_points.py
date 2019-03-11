@@ -28,7 +28,6 @@ def olc():
 	)
 	parser.add_argument(
 		'robot',
-		nargs='?',
 		help='path to the specifications file for the robot.'
 	)
 	args = parser.parse_args()
@@ -40,11 +39,8 @@ def olc():
 		task = json.load(taskFile)
 	with open(args.network, 'r') as networkFile:
 		network = json.load(networkFile)
-	if args.robot is not None:
-		with open(args.robot, 'r') as robotFile:
-			robot = json.load(robotFile)
-	else:
-		robot = None
+	with open(args.robot, 'r') as robotFile:
+		robot = json.load(robotFile)
 
 	# Connect to simulator
 	if robot is not None:
