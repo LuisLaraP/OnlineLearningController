@@ -1,14 +1,17 @@
 [
 	{
 		"type": "dense",
-		"units": 64
+		"units": 64,
+		"activation": "relu"
 	},
 	{
 		"type": "dense",
-		"units": 64
+		"units": 64,
+		"activation": "relu"
 	},
 	{
 		"type": "dense",
-		"units": 64
+		"units": 64,
+		"activation": "relu"
 	}
 ]

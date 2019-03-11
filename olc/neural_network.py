@@ -7,5 +7,5 @@ def buildNetwork(name, specs):
 		model = tf.keras.Sequential()
 		for layer in specs:
 			if layer['type'] == 'dense':
-				model.add(layers.Dense(layer['units']))
+				model.add(layers.Dense(layer['units'], activation=layer['activation']))
 	return model
