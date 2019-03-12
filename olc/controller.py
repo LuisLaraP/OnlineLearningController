@@ -35,4 +35,5 @@ class Controller:
 				newTime = time.time()
 				elapsed = (newTime - lastTime) * 1000
 				lastTime = newTime
-				self.logger.log([reward, elapsed])
+				self.logger.logScalar('Reward', reward, step)
+				self.logger.logScalar('Sampling time', elapsed, step)
