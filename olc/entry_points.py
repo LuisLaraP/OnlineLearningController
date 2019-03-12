@@ -48,9 +48,9 @@ def olc():
 
 	# Create logger
 	time = datetime.datetime.now().time()
-	logFile = os.path.splitext(os.path.basename(args.task))[0]
-	logFile = 'logs/{}-{:%H:%M}.log'.format(logFile, time)
-	logger = Logger(logFile, visualize=['Reward', 'Sampling time'])
+	logDir = os.path.splitext(os.path.basename(args.task))[0]
+	logDir = 'logs/{}-{:%H:%M}'.format(logDir, time)
+	logger = Logger(logDir)
 
 	# Create controller
 	defParams = getDefaults(__name__, 'params')

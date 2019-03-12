@@ -9,7 +9,6 @@ class Controller:
 		self.settings = settings
 		self.env = environment
 		self.logger = logger
-		self.logger.setNames(['Reward', 'Sampling time'])
 		self.q = buildNetwork('Q', network)
 
 	def run(self):
