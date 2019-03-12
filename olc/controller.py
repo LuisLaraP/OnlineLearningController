@@ -9,7 +9,7 @@ class Controller:
 		self.settings = settings
 		self.env = environment
 		self.logger = logger
-		self.logger.setNames(['Reward'])
+		self.logger.setNames(['Reward', 'Sampling time'])
 		self.q = buildNetwork('Q', network)
 
 	def run(self):
@@ -26,10 +26,14 @@ class Controller:
 			episode += 1
 			state = self.env.reset()
 			reset = False
+			lastTime = time.time()
 			while not reset and step <= self.settings['steps']:
 				step += 1
 				state, reward, reset = self.env.getState()
 				action = self.env.action_space.sample()
 				self.env.act(action)
 				time.sleep(self.settings['timestep'])
-				self.logger.log([reward])
+				newTime = time.time()
+				elapsed = (newTime - lastTime) * 1000
+				lastTime = newTime
+				self.logger.log([reward, elapsed])

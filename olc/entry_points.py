@@ -50,7 +50,7 @@ def olc():
 	time = datetime.datetime.now().time()
 	logFile = os.path.splitext(os.path.basename(args.task))[0]
 	logFile = 'logs/{}-{:%H:%M}.log'.format(logFile, time)
-	logger = Logger(logFile, visualize=['reward'])
+	logger = Logger(logFile, visualize=['Reward', 'Sampling time'])
 
 	# Create controller
 	defParams = getDefaults(__name__, 'params')
