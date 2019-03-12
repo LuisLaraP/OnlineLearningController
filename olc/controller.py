@@ -1,3 +1,5 @@
+import time
+
 from olc.neural_network import buildNetwork
 
 
@@ -22,6 +24,8 @@ class Controller:
 		for _ in range(self.settings['steps']):
 			if reset:
 				state = self.env.reset()
+			state, reward, reset = self.env.getState()
 			action = self.env.action_space.sample()
-			state, reward, reset, info = self.env.step(action)
+			self.env.act(action)
+			time.sleep(self.settings['timestep'])
 			self.logger.log([reward])

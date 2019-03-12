@@ -47,6 +47,9 @@ class Reach:
 		self.sim.registerDistanceObject(self.settings['error-object-name'])
 		self.lastError = None
 
+	def act(self, action):
+		self.sim.setJointVelocities(action)
+
 	def close(self):
 		self.sim.close()
 
@@ -56,29 +59,7 @@ class Reach:
 		time.sleep(0.2)
 		self.lastError = self.sim.readDistance(self.settings['error-object-name'])
 
-	def step(self, action):
-		"""
-		Take an action and advance the simulation.
-
-		Parameters
-		----------
-		action : array-like
-			Action to execute in this timestep.
-
-		Returns
-		-------
-		state : array-like
-			State of the environment after taking the given action.
-		reward : float
-			Reward obtained for taking the given action.
-		reset : bool
-			True if the episode ended in this timestep. The user must call the `reset`
-			method after this happens.
-		info
-			This return value is always None.
-		"""
-		self.sim.setJointVelocities(action)
-		time.sleep(self.settings['timestep'])
+	def getState(self):
 		pos = self.sim.getJointPositions()
 		vel = self.sim.getJointVelocities()
 		error = self.sim.readDistance(self.settings['error-object-name'])
@@ -89,4 +70,4 @@ class Reach:
 			reset = True
 		else:
 			reset = False
-		return state, reward, reset, None
+		return state, reward, reset
