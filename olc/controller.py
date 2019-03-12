@@ -20,12 +20,16 @@ class Controller:
 		settings. If an episode ends before reaching the target number of steps, the
 		environment is reset and the experiment continues.
 		"""
-		reset = True
-		for _ in range(self.settings['steps']):
-			if reset:
-				state = self.env.reset()
-			state, reward, reset = self.env.getState()
-			action = self.env.action_space.sample()
-			self.env.act(action)
-			time.sleep(self.settings['timestep'])
-			self.logger.log([reward])
+		episode = 0
+		step = 0
+		while step <= self.settings['steps']:
+			episode += 1
+			state = self.env.reset()
+			reset = False
+			while not reset and step <= self.settings['steps']:
+				step += 1
+				state, reward, reset = self.env.getState()
+				action = self.env.action_space.sample()
+				self.env.act(action)
+				time.sleep(self.settings['timestep'])
+				self.logger.log([reward])
