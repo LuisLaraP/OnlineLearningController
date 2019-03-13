@@ -25,15 +25,16 @@ class Controller:
 			episode += 1
 			state = self.env.reset()
 			reset = False
-			lastTime = time.time()
 			while not reset and step <= self.settings['steps']:
+				startTime = time.time()
 				step += 1
 				state, reward, reset = self.env.getState()
 				action = self.env.action_space.sample()
 				self.env.act(action)
-				time.sleep(self.settings['timestep'])
-				newTime = time.time()
-				elapsed = (newTime - lastTime) * 1000
-				lastTime = newTime
+				activeTime = time.time()
+				waitTime = activeTime - startTime
+				time.sleep(self.settings['timestep'] - waitTime)
+				finalTime = time.time()
+				totalTime = (finalTime - startTime) * 1000
 				self.logger.logScalar('Reward', reward, step)
-				self.logger.logScalar('Sampling time', elapsed, step)
+				self.logger.logScalar('Sampling time', totalTime, step)
