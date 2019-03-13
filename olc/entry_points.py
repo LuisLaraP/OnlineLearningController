@@ -58,6 +58,5 @@ def olc():
 	controller = Controller(mergedParams, network, environment, logger)
 
 	# Run
-	input('Press ENTER to start.\n')
 	controller.run()
 	environment.close()
