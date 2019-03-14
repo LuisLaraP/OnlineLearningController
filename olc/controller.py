@@ -1,6 +1,7 @@
 import time
 
 from olc.neural_network import buildNetwork
+from olc.noise import OrnsteinUhlenbeck
 
 
 class Controller:
@@ -10,6 +11,12 @@ class Controller:
 		self.env = environment
 		self.logger = logger
 		self.q = buildNetwork('Q', network)
+		self.random = OrnsteinUhlenbeck(
+			self.env.action_space.low.shape,
+			self.settings['timestep'],
+			self.settings['noise']['theta'],
+			self.settings['noise']['sigma']
+		)
 
 	def run(self):
 		"""
@@ -29,7 +36,7 @@ class Controller:
 				startTime = time.time()
 				step += 1
 				state, reward, reset = self.env.getState()
-				action = [0, 0, 0, 0, 0, 0]
+				action = self._randomPolicy()
 				self.env.act(action)
 				activeTime = time.time() - startTime
 				if activeTime > 0:
@@ -38,3 +45,6 @@ class Controller:
 				self.logger.logScalar('Reward', reward, step)
 				self.logger.logScalar('Active time', activeTime, step)
 				self.logger.logScalar('Sampling time', totalTime, step)
+
+	def _randomPolicy(self):
+		return self.random.step()
