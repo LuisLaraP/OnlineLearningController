@@ -30,6 +30,7 @@ class Controller:
 		step = 0
 		while step < self.settings['steps']:
 			episode += 1
+			self.random.reset()
 			state = self.env.reset()
 			reset = False
 			while not reset and step < self.settings['steps']:
