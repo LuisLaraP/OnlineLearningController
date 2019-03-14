@@ -33,7 +33,8 @@ class Controller:
 				self.env.act(action)
 				activeTime = time.time()
 				waitTime = activeTime - startTime
-				time.sleep(self.settings['timestep'] - waitTime)
+				if waitTime > 0:
+					time.sleep(self.settings['timestep'] - waitTime)
 				finalTime = time.time()
 				totalTime = (finalTime - startTime) * 1000
 				self.logger.logScalar('Reward', reward, step)
