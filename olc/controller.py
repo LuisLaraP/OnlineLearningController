@@ -31,11 +31,10 @@ class Controller:
 				state, reward, reset = self.env.getState()
 				action = self.env.action_space.sample()
 				self.env.act(action)
-				activeTime = time.time()
-				waitTime = activeTime - startTime
-				if waitTime > 0:
-					time.sleep(self.settings['timestep'] - waitTime)
-				finalTime = time.time()
-				totalTime = (finalTime - startTime) * 1000
+				activeTime = time.time() - startTime
+				if activeTime > 0:
+					time.sleep(self.settings['timestep'] - activeTime)
+				totalTime = (time.time() - startTime) * 1000
 				self.logger.logScalar('Reward', reward, step)
+				self.logger.logScalar('Active time', activeTime, step)
 				self.logger.logScalar('Sampling time', totalTime, step)
