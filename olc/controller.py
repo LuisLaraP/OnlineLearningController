@@ -21,15 +21,15 @@ class Controller:
 		"""
 		episode = 0
 		step = 0
-		while step <= self.settings['steps']:
+		while step < self.settings['steps']:
 			episode += 1
 			state = self.env.reset()
 			reset = False
-			while not reset and step <= self.settings['steps']:
+			while not reset and step < self.settings['steps']:
 				startTime = time.time()
 				step += 1
 				state, reward, reset = self.env.getState()
-				action = self.env.action_space.sample()
+				action = [0, 0, 0, 0, 0, 0]
 				self.env.act(action)
 				activeTime = time.time() - startTime
 				if activeTime > 0:
