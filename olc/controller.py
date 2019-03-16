@@ -39,11 +39,13 @@ class Controller:
 				state, reward, reset = self.env.getState()
 				action = self._randomPolicy()
 				self.env.act(action)
+				for i in range(len(action)):
+					self.logger.logScalar('Action {}'.format(i + 1), action[i], step)
+				self.logger.logScalar('Reward', reward, step)
 				activeTime = time.time() - startTime
 				if activeTime > 0:
 					time.sleep(self.settings['timestep'] - activeTime)
 				totalTime = (time.time() - startTime) * 1000
-				self.logger.logScalar('Reward', reward, step)
 				self.logger.logScalar('Active time', activeTime, step)
 				self.logger.logScalar('Sampling time', totalTime, step)
 
