@@ -40,7 +40,7 @@ class Controller:
 				action = self._randomPolicy()
 				self.env.act(action)
 				for i in range(len(action)):
-					self.logger.logScalar('Action {}'.format(i + 1), action[i], step)
+					self.logger.logScalar('Action/Axis {}'.format(i + 1), action[i], step)
 				self.logger.logScalar('Reward', reward, step)
 				activeTime = time.time() - startTime
 				if activeTime > 0:
