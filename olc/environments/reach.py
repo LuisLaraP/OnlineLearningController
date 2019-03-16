@@ -70,4 +70,4 @@ class Reach:
 			reset = True
 		else:
 			reset = False
-		return state, reward, reset
+		return state, reward, reset, error

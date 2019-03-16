@@ -36,12 +36,13 @@ class Controller:
 			while not reset and step < self.settings['steps']:
 				startTime = time.time()
 				step += 1
-				state, reward, reset = self.env.getState()
+				state, reward, reset, error = self.env.getState()
 				action = self._randomPolicy()
 				self.env.act(action)
 				for i in range(len(action)):
 					self.logger.logScalar('Action/Axis {}'.format(i + 1), action[i], step)
 				self.logger.logScalar('Reward', reward, step)
+				self.logger.logScalar('Error', error, step)
 				activeTime = time.time() - startTime
 				if activeTime > 0:
 					time.sleep(self.settings['timestep'] - activeTime)
