@@ -1,5 +1,6 @@
 {
 	"timestep": 0.05,
+	"replay-buffer-size": 100,
 	"noise": {
 		"theta": 2,
 		"sigma": 0.2

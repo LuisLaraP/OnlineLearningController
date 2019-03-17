@@ -2,6 +2,7 @@ import time
 
 from olc.neural_network import buildNetwork
 from olc.noise import OrnsteinUhlenbeck
+from olc.replay_buffer import ReplayBuffer
 
 
 class Controller:
@@ -17,6 +18,7 @@ class Controller:
 			self.settings['noise']['theta'],
 			self.settings['noise']['sigma']
 		)
+		self.replayBuffer = ReplayBuffer(self.settings['replay-buffer-size'])
 
 	def run(self):
 		"""
@@ -31,12 +33,18 @@ class Controller:
 		while step < self.settings['steps']:
 			episode += 1
 			self.random.reset()
+			lastState = None
+			action = None
+			reward = None
 			state = self.env.reset()
 			reset = False
 			while not reset and step < self.settings['steps']:
 				startTime = time.time()
 				step += 1
 				state, reward, reset, error = self.env.getState()
+				if lastState is not None:
+					self.replayBuffer.storeTransition(lastState, action, reward, state, reset)
+				lastState = state
 				action = self._randomPolicy()
 				self.env.act(action)
 				for i in range(len(action)):
@@ -47,7 +55,7 @@ class Controller:
 				if activeTime > 0:
 					time.sleep(self.settings['timestep'] - activeTime)
 				totalTime = (time.time() - startTime) * 1000
-				self.logger.logScalar('Active time', activeTime, step)
+				self.logger.logScalar('Active time', activeTime * 1000, step)
 				self.logger.logScalar('Sampling time', totalTime, step)
 
 	def _randomPolicy(self):
