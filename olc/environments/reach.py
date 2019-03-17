@@ -8,6 +8,7 @@ The control signal is a vector with the velocity of each of the joints of the
 robot, and the reward is based on the current distance to the target position.
 """
 
+import math
 import time
 from math import radians
 
@@ -63,11 +64,16 @@ class Reach:
 		pos = self.sim.getJointPositions()
 		vel = self.sim.getJointVelocities()
 		error = self.sim.readDistance(self.settings['error-object-name'])
-		reward = self.lastError - error
 		self.lastError = error
 		state = np.concatenate((pos, vel))
+		reward = self._computeReward(error, state)
 		if error <= self.settings['threshold-distance']:
 			reset = True
 		else:
 			reset = False
 		return state, reward, reset, error
+
+	def _computeReward(self, error, state):
+		errorTerm = -error * 10 + 10
+		constTerm = -5
+		return errorTerm + constTerm
