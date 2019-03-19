@@ -41,7 +41,7 @@ class Controller:
 			while not reset and step < self.settings['steps']:
 				startTime = time.time()
 				step += 1
-				state, reward, reset, error = self.env.getState()
+				state, reward, reset, info = self.env.getState()
 				if lastState is not None:
 					self.replayBuffer.storeTransition(lastState, action, reward, state, reset)
 				lastState = state
@@ -50,7 +50,8 @@ class Controller:
 				for i in range(len(action)):
 					self.logger.logScalar('Action/Axis {}'.format(i + 1), action[i], step)
 				self.logger.logScalar('Reward', reward, step)
-				self.logger.logScalar('Error', error, step)
+				self.logger.logScalar('Error', info['error'], step)
+				self.logger.logScalar('Error rate', info['error_diff'] / self.settings['timestep'], step)
 				activeTime = time.time() - startTime
 				if activeTime > 0:
 					time.sleep(self.settings['timestep'] - activeTime)

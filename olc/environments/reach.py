@@ -61,9 +61,12 @@ class Reach:
 		self.lastError = self.sim.readDistance(self.settings['error-object-name'])
 
 	def getState(self):
+		info = {}
 		pos = self.sim.getJointPositions()
 		vel = self.sim.getJointVelocities()
 		error = self.sim.readDistance(self.settings['error-object-name'])
+		info['error'] = error
+		info['error_diff'] = error - self.lastError
 		self.lastError = error
 		state = np.concatenate((pos, vel))
 		reward = self._computeReward(error, state)
@@ -71,7 +74,7 @@ class Reach:
 			reset = True
 		else:
 			reset = False
-		return state, reward, reset, error
+		return state, reward, reset, info
 
 	def _computeReward(self, error, state):
 		errorTerm = -error * 10 + 10
