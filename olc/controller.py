@@ -19,6 +19,7 @@ class Controller:
 			self.settings['noise']['sigma']
 		)
 		self.replayBuffer = ReplayBuffer(self.settings['replay-buffer-size'])
+		self.logger.logGraph()
 
 	def run(self):
 		"""
