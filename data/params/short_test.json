@@ -1,3 +1,10 @@
 {
-	"steps": 100
+	"steps": 100,
+	"critic": [
+		{
+			"type": "dense",
+			"units": 6,
+			"activation": "relu"
+		}
+	]
 }

@@ -23,10 +23,6 @@ def olc():
 		help='path to the specifications file for the task.'
 	)
 	parser.add_argument(
-		'network',
-		help='path to the specifications file for the neural network.'
-	)
-	parser.add_argument(
 		'robot',
 		help='path to the specifications file for the robot.'
 	)
@@ -37,8 +33,6 @@ def olc():
 		params = json.load(paramsFile)
 	with open(args.task, 'r') as taskFile:
 		task = json.load(taskFile)
-	with open(args.network, 'r') as networkFile:
-		network = json.load(networkFile)
 	with open(args.robot, 'r') as robotFile:
 		robot = json.load(robotFile)
 
@@ -55,7 +49,7 @@ def olc():
 	# Create controller
 	defParams = getDefaults(__name__, 'params')
 	mergedParams = merge(defParams, params)
-	controller = Controller(mergedParams, network, environment, logger)
+	controller = Controller(mergedParams, environment, logger)
 
 	# Run
 	controller.run()

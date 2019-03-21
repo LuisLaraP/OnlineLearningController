@@ -7,11 +7,11 @@ from olc.replay_buffer import ReplayBuffer
 
 class Controller:
 
-	def __init__(self, settings, network, environment, logger):
+	def __init__(self, settings, environment, logger):
 		self.settings = settings
 		self.env = environment
 		self.logger = logger
-		self.critic = buildNetwork('critic', network)
+		self.critic = buildNetwork('critic', self.settings['critic'])
 		self.random = OrnsteinUhlenbeck(
 			self.env.action_space.low.shape,
 			self.settings['timestep'],
