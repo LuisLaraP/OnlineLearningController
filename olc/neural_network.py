@@ -7,6 +7,10 @@ class NeuralNetwork:
 		self.input = None
 		self.output = None
 
+	def predict(self, x):
+		session = tf.get_default_session()
+		return session.run(self.output, {self.input: x})
+
 
 def buildNetwork(name, specs):
 	model = NeuralNetwork()

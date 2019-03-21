@@ -1,5 +1,7 @@
 import time
 
+import tensorflow as tf
+
 from olc.neural_network import buildNetwork
 from olc.noise import OrnsteinUhlenbeck
 from olc.replay_buffer import ReplayBuffer
@@ -29,6 +31,7 @@ class Controller:
 		settings. If an episode ends before reaching the target number of steps, the
 		environment is reset and the experiment continues.
 		"""
+		self.session = tf.Session().__enter__()
 		episode = 0
 		step = 0
 		while step < self.settings['steps']:
@@ -46,7 +49,8 @@ class Controller:
 				if lastState is not None:
 					self.replayBuffer.storeTransition(lastState, action, reward, state, reset)
 				lastState = state
-				action = self._randomPolicy()
+				action = self._learnedPolicy(state)
+				print(action)
 				self.env.act(action)
 				for i in range(len(action)):
 					self.logger.logScalar('Action/Axis {}'.format(i + 1), action[i], step)
@@ -60,5 +64,8 @@ class Controller:
 				self.logger.logScalar('Active time', activeTime * 1000, step)
 				self.logger.logScalar('Sampling time', totalTime, step)
 
-	def _randomPolicy(self):
+	def _learnedPolicy(self, state):
+		return self.critic.predict(state)
+
+	def _randomPolicy(self, _):
 		return self.random.step()
