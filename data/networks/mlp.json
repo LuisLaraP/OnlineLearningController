@@ -6,12 +6,12 @@
 	},
 	{
 		"type": "dense",
-		"units": 64,
+		"units": 10,
 		"activation": "relu"
 	},
 	{
 		"type": "dense",
-		"units": 64,
+		"units": 1,
 		"activation": "relu"
 	}
 ]

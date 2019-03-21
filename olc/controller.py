@@ -11,7 +11,7 @@ class Controller:
 		self.settings = settings
 		self.env = environment
 		self.logger = logger
-		self.q = buildNetwork('Q', network)
+		self.critic = buildNetwork('critic', network)
 		self.random = OrnsteinUhlenbeck(
 			self.env.action_space.low.shape,
 			self.settings['timestep'],

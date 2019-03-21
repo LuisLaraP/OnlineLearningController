@@ -1,11 +1,9 @@
-import tensorflow as tf
-from tensorflow.keras import layers
+class NeuralNetwork:
+
+	def __init__(self):
+		pass
 
 
 def buildNetwork(name, specs):
-	with tf.variable_scope(name):
-		model = tf.keras.Sequential()
-		for layer in specs:
-			if layer['type'] == 'dense':
-				model.add(layers.Dense(layer['units'], activation=layer['activation']))
+	model = NeuralNetwork()
 	return model
