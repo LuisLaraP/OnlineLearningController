@@ -10,6 +10,7 @@ class NeuralNetwork:
 
 def buildNetwork(name, specs):
 	model = NeuralNetwork()
-	model.input = tf.placeholder(tf.float32, name='input')
-	model.output = model.input
+	with tf.variable_scope(name):
+		model.input = tf.placeholder(tf.float32, name='input')
+		model.output = model.input
 	return model
