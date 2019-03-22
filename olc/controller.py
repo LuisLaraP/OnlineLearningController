@@ -13,7 +13,8 @@ class Controller:
 		self.settings = settings
 		self.env = environment
 		self.logger = logger
-		self.critic = buildNetwork('critic', self.settings['critic'])
+		nIn = self.env.observation_space.low.size
+		self.critic = buildNetwork('critic', self.settings['critic'], nIn)
 		self.random = OrnsteinUhlenbeck(
 			self.env.action_space.low.shape,
 			self.settings['timestep'],
@@ -65,7 +66,7 @@ class Controller:
 				self.logger.logScalar('Sampling time', totalTime, step)
 
 	def _learnedPolicy(self, state):
-		return self.critic.predict(state)
+		return self.critic.predict([state])[0]
 
 	def _randomPolicy(self, _):
 		return self.random.step()
