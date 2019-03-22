@@ -4,7 +4,8 @@
 		{
 			"type": "dense",
 			"units": 6,
-			"activation": "relu"
+			"activation": "relu",
+			"initializer": "glorot_uniform"
 		}
 	]
 }
