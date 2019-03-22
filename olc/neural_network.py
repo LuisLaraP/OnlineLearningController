@@ -38,3 +38,5 @@ def _denseLayer(i, specs, model):
 		initializer=tf.initializers.zeros()
 	))
 	model.output = model.output + model.parameters[-1]
+	if specs['activation'] != 'linear':
+		model.output = getattr(tf.nn, specs['activation'])(model.output)
