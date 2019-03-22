@@ -33,6 +33,7 @@ class Controller:
 		environment is reset and the experiment continues.
 		"""
 		self.session = tf.Session().__enter__()
+		self.session.run(tf.global_variables_initializer())
 		episode = 0
 		step = 0
 		while step < self.settings['steps']:
