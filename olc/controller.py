@@ -22,6 +22,7 @@ class Controller:
 			self.settings['noise']['sigma']
 		)
 		self.replayBuffer = ReplayBuffer(self.settings['replay-buffer-size'])
+		self._setupTraining()
 		self.logger.logGraph()
 
 	def run(self):
@@ -71,3 +72,14 @@ class Controller:
 
 	def _randomPolicy(self, _):
 		return self.random.step()
+
+	def _setupTraining(self):
+		self.labels = tf.placeholder(tf.float32,
+			(None, self.critic.output.shape[-1]), 'labels')
+		self.loss = tf.losses.mean_squared_error(self.labels, self.critic.output)
+		optName = self.settings['optimizer']['name'] + 'Optimizer'
+		optSettings = self.settings['optimizer']
+		optSettings.pop('name', None)
+		print(optSettings)
+		self.optimizer = getattr(tf.train, optName)(**optSettings)
+		print(self.optimizer)

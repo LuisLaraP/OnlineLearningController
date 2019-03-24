@@ -7,5 +7,11 @@
 			"activation": "relu",
 			"initializer": "glorot_uniform"
 		}
-	]
+	],
+	"optimizer": {
+		"name": "RMSProp",
+		"learning_rate": 0.00025,
+		"decay": 0.95,
+		"momentum": 0.95
+	}
 }
