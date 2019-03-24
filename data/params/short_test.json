@@ -1,9 +1,10 @@
 {
 	"steps": 100,
+	"batch-size": 32,
 	"critic": [
 		{
 			"type": "dense",
-			"units": 6,
+			"units": 1,
 			"activation": "relu",
 			"initializer": "glorot_uniform"
 		}

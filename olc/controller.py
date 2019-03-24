@@ -1,5 +1,6 @@
 import time
 
+import numpy as np
 import tensorflow as tf
 
 from olc.neural_network import buildNetwork
@@ -52,9 +53,10 @@ class Controller:
 				if lastState is not None:
 					self.replayBuffer.storeTransition(lastState, action, reward, state, reset)
 				lastState = state
-				action = self._learnedPolicy(state)
-				print(action)
+				action = self._randomPolicy(state)
 				self.env.act(action)
+				loss = self._trainCritic()
+				self.logger.logScalar('Loss', loss, step)
 				for i in range(len(action)):
 					self.logger.logScalar('Action/Axis {}'.format(i + 1), action[i], step)
 				self.logger.logScalar('Reward', reward, step)
@@ -68,7 +70,7 @@ class Controller:
 				self.logger.logScalar('Sampling time', totalTime, step)
 
 	def _learnedPolicy(self, state):
-		return self.critic.predict([state])[0]
+		return np.zeros(self.env.action_space.low.size)
 
 	def _randomPolicy(self, _):
 		return self.random.step()
@@ -80,6 +82,15 @@ class Controller:
 		optName = self.settings['optimizer']['name'] + 'Optimizer'
 		optSettings = self.settings['optimizer']
 		optSettings.pop('name', None)
-		print(optSettings)
-		self.optimizer = getattr(tf.train, optName)(**optSettings)
-		print(self.optimizer)
+		optimizer = getattr(tf.train, optName)(**optSettings)
+		self.train = optimizer.minimize(self.loss)
+
+	def _trainCritic(self):
+		s0, a, r, sf, _ = self.replayBuffer.sample(self.settings['batch-size'])
+		loss = 0
+		if len(s0) > 0:
+			_, loss = self.session.run([self.train, self.loss], {
+				self.critic.input: s0,
+				self.labels: np.reshape(r, (len(r), 1))
+			})
+		return loss
