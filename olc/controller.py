@@ -15,6 +15,7 @@ class Controller:
 		self.env = environment
 		self.logger = logger
 		nIn = self.env.observation_space.low.size
+		self.actor = buildNetwork('actor', self.settings['actor'], nIn)
 		self.critic = buildNetwork('critic', self.settings['critic'], nIn)
 		self.random = OrnsteinUhlenbeck(
 			self.env.action_space.low.shape,
@@ -53,7 +54,7 @@ class Controller:
 				if lastState is not None:
 					self.replayBuffer.storeTransition(lastState, action, reward, state, reset)
 				lastState = state
-				action = self._randomPolicy(state)
+				action = self._learnedPolicy(state)[0]
 				self.env.act(action)
 				loss = self._trainCritic()
 				self.logger.logScalar('Loss', loss, step)
@@ -70,7 +71,9 @@ class Controller:
 				self.logger.logScalar('Sampling time', totalTime, step)
 
 	def _learnedPolicy(self, state):
-		return np.zeros(self.env.action_space.low.size)
+		return self.session.run(self.actor.output, {
+			self.actor.input: [state]
+		})
 
 	def _randomPolicy(self, _):
 		return self.random.step()

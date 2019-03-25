@@ -1,6 +1,14 @@
 {
 	"steps": 100,
 	"batch-size": 32,
+	"actor": [
+		{
+			"type": "dense",
+			"units": 6,
+			"activation": "tanh",
+			"initializer": "glorot_uniform"
+		}
+	],
 	"critic": [
 		{
 			"type": "dense",
