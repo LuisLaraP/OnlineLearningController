@@ -20,6 +20,12 @@ class Box:
 		self.high = np.array(high)
 		assert self.low.shape == self.high.shape
 
+	def clip(self, x):
+		iLow = np.greater(self.low, x)
+		x[iLow] = self.low[iLow]
+		iHigh = np.greater(x, self.high)
+		x[iHigh] = self.high[iHigh]
+
 	def sample(self):
 		"""
 		Draw a random element in this space.

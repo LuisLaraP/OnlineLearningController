@@ -55,6 +55,7 @@ class Controller:
 					self.replayBuffer.storeTransition(lastState, action, reward, state, reset)
 				lastState = state
 				action = self._learnedPolicy(state)
+				self.env.action_space.clip(action)
 				self.env.act(action)
 				loss = self._trainCritic()
 				self.logger.logScalar('Loss', loss, step)
