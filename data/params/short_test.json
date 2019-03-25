@@ -1,6 +1,7 @@
 {
 	"steps": 100,
 	"batch-size": 32,
+	"gamma": 0.99,
 	"actor": [
 		{
 			"type": "dense",

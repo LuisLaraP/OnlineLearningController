@@ -54,7 +54,7 @@ class Controller:
 				if lastState is not None:
 					self.replayBuffer.storeTransition(lastState, action, reward, state, reset)
 				lastState = state
-				action = self._learnedPolicy(state)[0]
+				action = self._learnedPolicy(state)
 				self.env.act(action)
 				loss = self._trainCritic()
 				self.logger.logScalar('Loss', loss, step)
@@ -73,7 +73,7 @@ class Controller:
 	def _learnedPolicy(self, state):
 		return self.session.run(self.actor.output, {
 			self.actor.input: [state]
-		})
+		})[0]
 
 	def _randomPolicy(self, _):
 		return self.random.step()
@@ -92,8 +92,12 @@ class Controller:
 		s0, a, r, sf, _ = self.replayBuffer.sample(self.settings['batch-size'])
 		loss = 0
 		if len(s0) > 0:
+			returns = self.session.run(self.critic.output, {
+				self.critic.input: sf
+			})
+			labels = np.reshape(r, (len(r), 1)) + self.settings['gamma'] * returns
 			_, loss = self.session.run([self.train, self.loss], {
 				self.critic.input: s0,
-				self.labels: np.reshape(r, (len(r), 1))
+				self.labels: labels
 			})
 		return loss
