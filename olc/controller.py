@@ -104,6 +104,9 @@ class Controller:
 		optSettings.pop('name', None)
 		optimizer = getattr(tf.train, optName)(**optSettings)
 		self.train = optimizer.minimize(self.loss)
+		self.criticGrad = tf.gradients(self.critic.output, self.action,
+			name='critic_gradients'
+		)
 
 	def _trainCritic(self):
 		s0, a, r, sf, _ = self.replayBuffer.sample(self.settings['batch-size'])
