@@ -4,6 +4,10 @@
 	"gamma": 0.99,
 	"actor": [
 		{
+			"type": "input",
+			"name": "state"
+		},
+		{
 			"type": "dense",
 			"units": 6,
 			"activation": "tanh",
@@ -11,6 +15,14 @@
 		}
 	],
 	"critic": [
+		{
+			"type": "input",
+			"name": "state"
+		},
+		{
+			"type": "input",
+			"name": "action"
+		},
 		{
 			"type": "dense",
 			"units": 1,

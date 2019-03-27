@@ -14,9 +14,20 @@ class Controller:
 		self.settings = settings
 		self.env = environment
 		self.logger = logger
-		nIn = self.env.observation_space.low.size
-		self.actor = buildNetwork('actor', self.settings['actor'], nIn)
-		self.critic = buildNetwork('critic', self.settings['critic'], nIn)
+		self.action = tf.placeholder(
+			tf.float32,
+			(None, self.env.action_space.low.size),
+			name='action'
+		)
+		self.state = tf.placeholder(
+			tf.float32,
+			(None, self.env.observation_space.low.size),
+			name='state'
+		)
+		actorInputs = {'state': self.state}
+		criticInputs = {'action': self.action, 'state': self.state}
+		self.actor = buildNetwork('actor', self.settings['actor'], actorInputs)
+		self.critic = buildNetwork('critic', self.settings['critic'], criticInputs)
 		self.random = OrnsteinUhlenbeck(
 			self.env.action_space.low.shape,
 			self.settings['timestep'],
@@ -73,7 +84,7 @@ class Controller:
 
 	def _learnedPolicy(self, state):
 		return self.session.run(self.actor.output, {
-			self.actor.input: [state]
+			self.state: [state]
 		})[0]
 
 	def _randomPolicy(self, _):
@@ -99,11 +110,13 @@ class Controller:
 		loss = 0
 		if len(s0) > 0:
 			returns = self.session.run(self.critic.output, {
-				self.critic.input: sf
+				self.state: sf,
+				self.action: a
 			})
 			labels = np.reshape(r, (len(r), 1)) + self.settings['gamma'] * returns
 			_, loss = self.session.run([self.train, self.loss], {
-				self.critic.input: s0,
+				self.state: s0,
+				self.action: np.zeros((len(sf), 6)),
 				self.labels: labels
 			})
 		return loss
