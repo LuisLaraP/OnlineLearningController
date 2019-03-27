@@ -91,10 +91,6 @@ class Controller:
 		return self.random.step()
 
 	def _setupTraining(self):
-		# Actor
-		self.actorGrad = tf.gradients(self.actor.output, self.actor.parameters,
-			name='actor_gradients'
-		)
 		# Critic
 		self.labels = tf.placeholder(tf.float32,
 			(None, self.critic.output.shape[-1]), 'labels')
@@ -106,6 +102,11 @@ class Controller:
 		self.train = optimizer.minimize(self.loss)
 		self.criticGrad = tf.gradients(self.critic.output, self.action,
 			name='critic_gradients'
+		)
+		# Actor
+		self.actorGrad = tf.gradients(self.actor.output, self.actor.parameters,
+			-self.criticGrad[0],
+			name='actor_gradients'
 		)
 
 	def _trainCritic(self):
