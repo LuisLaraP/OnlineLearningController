@@ -14,6 +14,10 @@
 			"initializer": "glorot_uniform"
 		}
 	],
+	"actor-optimizer": {
+		"name": "Adam",
+		"learning_rate": 0.0001
+	},
 	"critic": [
 		{
 			"type": "input",
@@ -30,10 +34,8 @@
 			"initializer": "glorot_uniform"
 		}
 	],
-	"optimizer": {
-		"name": "RMSProp",
-		"learning_rate": 0.00025,
-		"decay": 0.95,
-		"momentum": 0.95
+	"critic-optimizer": {
+		"name": "Adam",
+		"learning_rate": 0.001
 	}
 }
