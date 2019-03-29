@@ -99,7 +99,7 @@ class Controller:
 		optSettings = self.settings['critic-optimizer']
 		optSettings.pop('name', None)
 		criticOptimizer = getattr(tf.train, optName)(**optSettings)
-		self.trainCritic = criticOptimizer.minimize(self.loss)
+		self.trainCritic = criticOptimizer.minimize(self.loss, name='train_critic')
 		self.criticGrad = tf.gradients(self.critic.output, self.action,
 			name='critic_gradients'
 		)
@@ -112,15 +112,20 @@ class Controller:
 		optSettings = self.settings['actor-optimizer']
 		optSettings.pop('name', None)
 		actorOptimizer = getattr(tf.train, optName)(**optSettings)
-		self.trainActor = actorOptimizer.apply_gradients(zip(self.actorGrad, self.actor.parameters))
+		self.trainActor = actorOptimizer.apply_gradients(zip(self.actorGrad, self.actor.parameters),
+			name='train_actor'
+		)
 
 	def _train(self):
 		s0, a, r, sf, _ = self.replayBuffer.sample(self.settings['batch-size'])
 		loss = 0
 		if len(s0) > 0:
+			actions = self.session.run(self.actor.output, {
+				self.state: sf
+			})
 			returns = self.session.run(self.critic.output, {
 				self.state: sf,
-				self.action: a
+				self.action: actions
 			})
 			labels = np.reshape(r, (len(r), 1)) + self.settings['gamma'] * returns
 			returns = self.session.run([self.trainActor, self.trainCritic, self.loss], {
