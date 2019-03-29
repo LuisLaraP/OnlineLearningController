@@ -27,7 +27,9 @@ class Controller:
 		actorInputs = {'state': self.state}
 		criticInputs = {'action': self.action, 'state': self.state}
 		self.actor = buildNetwork('actor', self.settings['actor'], actorInputs)
+		self.actorTarget = buildNetwork('actor_target', self.settings['actor'], actorInputs)
 		self.critic = buildNetwork('critic', self.settings['critic'], criticInputs)
+		self.criticTarget = buildNetwork('critic_target', self.settings['critic'], criticInputs)
 		self.random = OrnsteinUhlenbeck(
 			self.env.action_space.low.shape,
 			self.settings['timestep'],
