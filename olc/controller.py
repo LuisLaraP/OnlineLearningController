@@ -68,7 +68,7 @@ class Controller:
 				action = self._learnedPolicy(state)
 				self.env.action_space.clip(action)
 				self.env.act(action)
-				loss = self._trainCritic()
+				loss = self._train()
 				self.logger.logScalar('Loss', loss, step)
 				for i in range(len(action)):
 					self.logger.logScalar('Action/Axis {}'.format(i + 1), action[i], step)
@@ -109,12 +109,12 @@ class Controller:
 			name='actor_gradients'
 		)
 		optName = self.settings['actor-optimizer']['name'] + 'Optimizer'
-		optSettings = self.settings['critic-optimizer']
+		optSettings = self.settings['actor-optimizer']
 		optSettings.pop('name', None)
 		actorOptimizer = getattr(tf.train, optName)(**optSettings)
 		self.trainActor = actorOptimizer.apply_gradients(zip(self.actorGrad, self.actor.parameters))
 
-	def _trainCritic(self):
+	def _train(self):
 		s0, a, r, sf, _ = self.replayBuffer.sample(self.settings['batch-size'])
 		loss = 0
 		if len(s0) > 0:
@@ -123,9 +123,10 @@ class Controller:
 				self.action: a
 			})
 			labels = np.reshape(r, (len(r), 1)) + self.settings['gamma'] * returns
-			_, loss = self.session.run([self.trainCritic, self.loss], {
+			returns = self.session.run([self.trainActor, self.trainCritic, self.loss], {
 				self.state: s0,
 				self.action: np.zeros((len(sf), 6)),
 				self.labels: labels
 			})
+			loss = returns[-1]
 		return loss
