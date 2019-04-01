@@ -17,8 +17,10 @@ class NeuralNetwork:
 		return session.run(self.output, {self.input: x})
 
 	def setParameters(self, values, tau=1.0):
-		for i in len(values):
-			self.parameters[i].load(tau * values[i] + (1 - tau) * self.parameters[i])
+		session = tf.get_default_session()
+		oldValues = session.run(self.parameters)
+		for i in range(len(values)):
+			self.parameters[i].load(tau * values[i] + (1 - tau) * oldValues[i])
 
 
 def buildNetwork(name, specs, inputs):

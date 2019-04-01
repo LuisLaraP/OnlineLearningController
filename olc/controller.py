@@ -71,6 +71,7 @@ class Controller:
 				self.env.action_space.clip(action)
 				self.env.act(action)
 				loss = self._train()
+				self._updateTargetNetworks()
 				self.logger.logScalar('Loss', loss, step)
 				for i in range(len(action)):
 					self.logger.logScalar('Action/Axis {}'.format(i + 1), action[i], step)
@@ -137,3 +138,9 @@ class Controller:
 			})
 			loss = returns[-1]
 		return loss
+
+	def _updateTargetNetworks(self):
+		actorParams = self.actor.getParameters()
+		criticParams = self.critic.getParameters()
+		self.actorTarget.setParameters(actorParams, self.settings['tau'])
+		self.criticTarget.setParameters(criticParams, self.settings['tau'])

@@ -2,6 +2,7 @@
 	"steps": 100,
 	"batch-size": 32,
 	"gamma": 0.99,
+	"tau": 0.001,
 	"actor": [
 		{
 			"type": "input",
