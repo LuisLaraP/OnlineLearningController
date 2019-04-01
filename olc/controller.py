@@ -123,10 +123,10 @@ class Controller:
 		s0, a, r, sf, _ = self.replayBuffer.sample(self.settings['batch-size'])
 		loss = 0
 		if len(s0) > 0:
-			actions = self.session.run(self.actor.output, {
+			actions = self.session.run(self.actorTarget.output, {
 				self.state: sf
 			})
-			returns = self.session.run(self.critic.output, {
+			returns = self.session.run(self.criticTarget.output, {
 				self.state: sf,
 				self.action: actions
 			})
