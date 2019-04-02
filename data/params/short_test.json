@@ -1,12 +1,25 @@
 {
-	"steps": 100,
+	"steps": 10000,
 	"batch-size": 32,
 	"gamma": 0.99,
 	"tau": 0.001,
+	"replay-buffer-size": 2000,
 	"actor": [
 		{
 			"type": "input",
 			"name": "state"
+		},
+		{
+			"type": "dense",
+			"units": 400,
+			"activation": "relu",
+			"initializer": "glorot_uniform"
+		},
+		{
+			"type": "dense",
+			"units": 300,
+			"activation": "relu",
+			"initializer": "glorot_uniform"
 		},
 		{
 			"type": "dense",
@@ -30,8 +43,20 @@
 		},
 		{
 			"type": "dense",
-			"units": 1,
+			"units": 400,
 			"activation": "relu",
+			"initializer": "glorot_uniform"
+		},
+		{
+			"type": "dense",
+			"units": 300,
+			"activation": "relu",
+			"initializer": "glorot_uniform"
+		},
+		{
+			"type": "dense",
+			"units": 1,
+			"activation": "linear",
 			"initializer": "glorot_uniform"
 		}
 	],
