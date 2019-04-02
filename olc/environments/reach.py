@@ -79,5 +79,5 @@ class Reach:
 
 	def _computeReward(self, e, de):
 		propTerm = self.settings['kp'] * (self.settings['threshold-distance'] - e)
-		diffTerm = self.settings['kd'] * de
+		diffTerm = -self.settings['kd'] * de
 		return propTerm + diffTerm
