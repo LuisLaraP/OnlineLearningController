@@ -1,3 +1,5 @@
 {
-	"name": "Reach"
+	"name": "Reach",
+	"kp": 10,
+	"kd": 1
 }
