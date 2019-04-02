@@ -89,6 +89,7 @@ class Simulation:
 			vrep.simx_opmode_streaming)
 
 	def setJointVelocities(self, vels):
+		vels *= self.robot['speed-override']
 		for i in range(len(self.joints)):
 			vrep.simxSetJointTargetVelocity(self.id, self.joints[i], vels[i],
 				vrep.simx_opmode_oneshot)

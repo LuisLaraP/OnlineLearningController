@@ -1,4 +1,5 @@
 {
+	"speed-override": 0.05,
 	"joints": [
 		"KR5arcHW_joint1",
 		"KR5arcHW_joint2",

@@ -49,6 +49,7 @@ class Reach:
 		self.lastError = None
 
 	def act(self, action):
+		self.action_space.scale(action)
 		self.sim.setJointVelocities(action)
 
 	def close(self):
