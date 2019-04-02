@@ -79,8 +79,9 @@ class Controller:
 				self.logger.logScalar('Error', info['error'], step)
 				self.logger.logScalar('Error rate', info['error_diff'] / self.settings['timestep'], step)
 				activeTime = time.time() - startTime
-				if activeTime > 0:
-					time.sleep(self.settings['timestep'] - activeTime)
+				sleepTime = self.settings['timestep'] - activeTime
+				if sleepTime > 0:
+					time.sleep(sleepTime)
 				totalTime = (time.time() - startTime) * 1000
 				self.logger.logScalar('Active time', activeTime * 1000, step)
 				self.logger.logScalar('Sampling time', totalTime, step)
