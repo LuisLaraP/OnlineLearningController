@@ -36,3 +36,7 @@ class Box:
 			Element sampled.
 		"""
 		return np.random.uniform(self.low, np.nextafter(self.high, np.inf))
+
+	def scale(self, x):
+		x[x > 0] = np.multiply(x[x > 0], self.high[x > 0])
+		x[x < 0] = -np.multiply(x[x < 0], self.low[x < 0])

@@ -68,7 +68,7 @@ class Controller:
 					self.replayBuffer.storeTransition(lastState, action, reward, state, reset)
 				lastState = state
 				action = self._learnedPolicy(state)
-				self.env.action_space.clip(action)
+				self.env.action_space.scale(action)
 				self.env.act(action)
 				loss = self._train()
 				self._updateTargetNetworks()
