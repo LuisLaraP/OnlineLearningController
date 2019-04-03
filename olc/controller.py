@@ -33,7 +33,8 @@ class Controller:
 		noiseName = self.settings['noise']['name']
 		noiseParams = self.settings['noise']
 		noiseParams.pop('name', None)
-		noiseParams['ndim'] = self.env.action_space.low.shape
+		noiseParams['ndim'] = self.env.action_space.low.size
+		noiseParams['dt'] = self.settings['timestep']
 		self.noise = getattr(olc.noise, noiseName)(**noiseParams)
 		self.replayBuffer = ReplayBuffer(self.settings['replay-buffer-size'])
 		self._setupTraining()
@@ -66,7 +67,7 @@ class Controller:
 				if lastState is not None:
 					self.replayBuffer.storeTransition(lastState, action, reward, state, reset)
 				lastState = state
-				action = self._learnedPolicy(state)
+				action = self._randomPolicy(state)
 				self.env.act(action)
 				loss = self._train()
 				self._updateTargetNetworks()

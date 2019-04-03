@@ -18,3 +18,19 @@ class OrnsteinUhlenbeck:
 		dx = self.theta * (self.mu - self.x) * self.dt + self.sigma * wiener
 		self.x += dx
 		return self.x
+
+
+class Sinusoid:
+
+	def __init__(self, ndim, dt, basePeriod):
+		self.dt = dt
+		t = np.linspace(basePeriod, basePeriod / 2.0, num=ndim)
+		self.f = 2 * np.pi / t
+		self.x = 0.0
+
+	def reset(self):
+		self.x = 0.0
+
+	def step(self):
+		self.x += self.dt
+		return np.sin(self.x * self.f)

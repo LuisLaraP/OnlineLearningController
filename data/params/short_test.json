@@ -63,5 +63,9 @@
 	"critic-optimizer": {
 		"name": "Adam",
 		"learning_rate": 0.001
+	},
+	"noise": {
+		"name": "Sinusoid",
+		"basePeriod": 2
 	}
 }
