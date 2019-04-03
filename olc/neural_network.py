@@ -38,13 +38,13 @@ def _denseLayer(i, specs, model):
 	model.parameters.append(tf.get_variable(
 		'w' + str(i),
 		shape=(nIn, specs['units']),
-		initializer=getattr(tf.initializers, specs['initializer'])
+		initializer=getattr(tf.initializers, specs['initializer'])()
 	))
 	model.output = tf.matmul(model.output, model.parameters[-1])
 	model.parameters.append(tf.get_variable(
 		'b' + str(i),
 		shape=(specs['units']),
-		initializer=getattr(tf.initializers, specs['initializer'])
+		initializer=getattr(tf.initializers, specs['initializer'])()
 	))
 	model.output = model.output + model.parameters[-1]
 	if specs['activation'] != 'linear':

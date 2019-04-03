@@ -13,19 +13,19 @@
 			"type": "dense",
 			"units": 400,
 			"activation": "relu",
-			"initializer": "glorot_uniform"
+			"initializer": "lecun_uniform"
 		},
 		{
 			"type": "dense",
 			"units": 300,
 			"activation": "relu",
-			"initializer": "glorot_uniform"
+			"initializer": "lecun_uniform"
 		},
 		{
 			"type": "dense",
 			"units": 6,
 			"activation": "tanh",
-			"initializer": "glorot_uniform"
+			"initializer": "lecun_uniform"
 		}
 	],
 	"actor-optimizer": {
@@ -45,19 +45,19 @@
 			"type": "dense",
 			"units": 400,
 			"activation": "relu",
-			"initializer": "glorot_uniform"
+			"initializer": "lecun_uniform"
 		},
 		{
 			"type": "dense",
 			"units": 300,
 			"activation": "relu",
-			"initializer": "glorot_uniform"
+			"initializer": "lecun_uniform"
 		},
 		{
 			"type": "dense",
 			"units": 1,
 			"activation": "linear",
-			"initializer": "glorot_uniform"
+			"initializer": "lecun_uniform"
 		}
 	],
 	"critic-optimizer": {
