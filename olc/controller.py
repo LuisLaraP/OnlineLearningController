@@ -98,6 +98,8 @@ class Controller:
 		self.labels = tf.placeholder(tf.float32,
 			(None, self.critic.output.shape[-1]), 'labels')
 		self.loss = tf.losses.mean_squared_error(self.labels, self.critic.output)
+		regularizer = tf.contrib.layers.l2_regularizer(self.settings['critic-lambda'])
+		self.loss += tf.contrib.layers.apply_regularization(regularizer, self.critic.parameters)
 		optName = self.settings['critic-optimizer']['name'] + 'Optimizer'
 		optSettings = self.settings['critic-optimizer']
 		optSettings.pop('name', None)

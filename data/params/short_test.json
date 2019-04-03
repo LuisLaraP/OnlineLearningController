@@ -64,6 +64,7 @@
 		"name": "Adam",
 		"learning_rate": 0.001
 	},
+	"critic-lambda": 0.01,
 	"noise": {
 		"name": "Sinusoid",
 		"basePeriod": 2
