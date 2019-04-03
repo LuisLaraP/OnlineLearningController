@@ -68,12 +68,14 @@ class Controller:
 					self.replayBuffer.storeTransition(lastState, action, reward, state, reset)
 				lastState = state
 				action = self._learnedPolicy(state) + self._randomPolicy(state)
+				actionValue = self.session.run(self.critic.output, {self.state: [state], self.action: [action]})
 				self.env.act(action)
 				loss = self._train()
 				self._updateTargetNetworks()
 				self.logger.logScalar('Loss', loss, step)
 				for i in range(len(action)):
 					self.logger.logScalar('Action/Axis {}'.format(i + 1), action[i], step)
+				self.logger.logScalar('Action value', actionValue, step)
 				self.logger.logScalar('Reward', reward, step)
 				self.logger.logScalar('Error', info['error'], step)
 				self.logger.logScalar('Error rate', info['error_diff'] / self.settings['timestep'], step)
