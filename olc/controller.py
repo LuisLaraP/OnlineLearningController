@@ -3,8 +3,8 @@ import time
 import numpy as np
 import tensorflow as tf
 
+import olc.noise
 from olc.neural_network import buildNetwork
-from olc.noise import OrnsteinUhlenbeck
 from olc.replay_buffer import ReplayBuffer
 
 
@@ -30,12 +30,11 @@ class Controller:
 		self.actorTarget = buildNetwork('actor_target', self.settings['actor'], actorInputs)
 		self.critic = buildNetwork('critic', self.settings['critic'], criticInputs)
 		self.criticTarget = buildNetwork('critic_target', self.settings['critic'], criticInputs)
-		self.random = OrnsteinUhlenbeck(
-			self.env.action_space.low.shape,
-			self.settings['timestep'],
-			self.settings['noise']['theta'],
-			self.settings['noise']['sigma']
-		)
+		noiseName = self.settings['noise']['name']
+		noiseParams = self.settings['noise']
+		noiseParams.pop('name', None)
+		noiseParams['ndim'] = self.env.action_space.low.shape
+		self.noise = getattr(olc.noise, noiseName)(**noiseParams)
 		self.replayBuffer = ReplayBuffer(self.settings['replay-buffer-size'])
 		self._setupTraining()
 		self.logger.logGraph()
@@ -54,7 +53,7 @@ class Controller:
 		step = 0
 		while step < self.settings['steps']:
 			episode += 1
-			self.random.reset()
+			self.noise.reset()
 			lastState = None
 			action = None
 			reward = None
@@ -91,7 +90,7 @@ class Controller:
 		})[0]
 
 	def _randomPolicy(self, _):
-		return self.random.step()
+		return self.noise.step()
 
 	def _setupTraining(self):
 		# Critic
