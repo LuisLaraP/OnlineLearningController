@@ -67,8 +67,12 @@ class Controller:
 				if lastState is not None:
 					self.replayBuffer.storeTransition(lastState, action, reward, state, reset)
 				lastState = state
+<<<<<<< HEAD
 				action = self._learnedPolicy(state) + self._randomPolicy(state)
 				actionValue = self.session.run(self.critic.output, {self.state: [state], self.action: [action]})
+=======
+				action = 0.5 * self._learnedPolicy(state) + 0.5 * self._randomPolicy(state)
+>>>>>>> normalization
 				self.env.act(action)
 				loss = self._train()
 				self._updateTargetNetworks()

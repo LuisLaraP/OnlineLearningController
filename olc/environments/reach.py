@@ -48,8 +48,7 @@ class Reach:
 		self.lastError = None
 
 	def act(self, action):
-		self.action_space.scale(action)
-		self.sim.setJointVelocities(action)
+		self.sim.setJointVelocities(self.action_space.scale(action))
 
 	def close(self):
 		self.sim.close()
@@ -67,9 +66,11 @@ class Reach:
 		error = self.sim.readDistance(self.settings['error-object-name'])
 		info['error'] = error
 		dError = error - self.lastError
-		info['error_diff'] = dError
 		self.lastError = error
+		info['error_diff'] = dError
 		state = np.concatenate((pos, vel))
+		state = np.divide(state - self.observation_space.low,
+			self.observation_space.high - self.observation_space.low)
 		reward = self._computeReward(error, dError)
 		if error <= self.settings['threshold-distance']:
 			reset = True
