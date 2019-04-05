@@ -71,14 +71,18 @@ class Reach:
 		state = np.concatenate((pos, vel))
 		state = np.divide(state - self.observation_space.low,
 			self.observation_space.high - self.observation_space.low)
-		reward = self._computeReward(error, dError)
-		if error <= self.settings['threshold-distance']:
+		if error <= self.settings['threshold-success']:
+			reward = self.settings['reward-success']
+			reset = True
+		elif error >= self.settings['threshold-failure']:
+			reward = self.settings['reward-failure']
 			reset = True
 		else:
+			reward = self._computeReward(error, dError)
 			reset = False
 		return state, reward, reset, info
 
 	def _computeReward(self, e, de):
-		propTerm = self.settings['kp'] * (self.settings['threshold-distance'] - e)
+		propTerm = self.settings['kp'] * (self.settings['threshold-success'] - e)
 		diffTerm = -self.settings['kd'] * de
 		return propTerm + diffTerm
