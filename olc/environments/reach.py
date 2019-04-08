@@ -39,9 +39,11 @@ class Reach:
 			[radians(x) for x in self.sim.robot['max-velocities']]
 		)
 		self.observation_space = Box(
-			[radians(x) for x in self.sim.robot['joint-min']]
+			self.sim.robot['workspace-min']
+			+ [radians(x) for x in self.sim.robot['joint-min']]
 			+ [0] * len(self.sim.robot['max-velocities']),
-			[radians(x) for x in self.sim.robot['joint-max']]
+			self.sim.robot['workspace-max']
+			+ [radians(x) for x in self.sim.robot['joint-max']]
 			+ [radians(x) for x in self.sim.robot['max-velocities']]
 		)
 		self.sim.registerDistanceObject(self.settings['error-object-name'])
@@ -70,7 +72,7 @@ class Reach:
 		dError = error - self.lastError
 		self.lastError = error
 		info['error_diff'] = dError
-		state = np.concatenate((pos, vel))
+		state = np.concatenate((self.reference, pos, vel))
 		state = np.divide(state - self.observation_space.low,
 			self.observation_space.high - self.observation_space.low)
 		if error <= self.settings['threshold-success']:

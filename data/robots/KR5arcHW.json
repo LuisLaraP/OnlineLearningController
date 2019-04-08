@@ -1,5 +1,7 @@
 {
 	"speed-override": 0.05,
+	"workspace-min": [0.4, -0.9, 0.1],
+	"workspace-max": [1.1, 0.9, 1.2],
 	"joints": [
 		"KR5arcHW_joint1",
 		"KR5arcHW_joint2",
