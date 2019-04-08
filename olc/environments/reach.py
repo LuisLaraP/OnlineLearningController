@@ -58,6 +58,7 @@ class Reach:
 		self.sim.stop()
 		self.sim.start()
 		time.sleep(0.2)
+		self.reference = self.sim.getDummyPosition(self.settings['target-object-name'])
 		self.lastError = self.sim.readDistance(self.settings['error-object-name'])
 
 	def getState(self):

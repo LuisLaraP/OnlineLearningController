@@ -31,6 +31,11 @@ class Simulation:
 		self.stop()
 		vrep.simxFinish(self.id)
 
+	def getDummyPosition(self, name):
+		_, pos = vrep.simxGetObjectPosition(self.id, self.dummies[name], -1,
+			vrep.simx_opmode_buffer)
+		return pos
+
 	def getJointPositions(self):
 		"""
 		Get the current position of all joints.
@@ -92,6 +97,8 @@ class Simulation:
 	def registerDummyObject(self, name):
 		_, self.dummies[name] = vrep.simxGetObjectHandle(self.id, name,
 			vrep.simx_opmode_blocking)
+		vrep.simxGetObjectPosition(self.id, self.dummies[name], -1,
+			vrep.simx_opmode_streaming)
 
 	def setJointVelocities(self, vels):
 		vels *= self.robot['speed-override']
