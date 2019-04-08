@@ -45,6 +45,7 @@ class Reach:
 			+ [radians(x) for x in self.sim.robot['max-velocities']]
 		)
 		self.sim.registerDistanceObject(self.settings['error-object-name'])
+		self.sim.registerDummyObject(self.settings['target-object-name'])
 		self.lastError = None
 
 	def act(self, action):

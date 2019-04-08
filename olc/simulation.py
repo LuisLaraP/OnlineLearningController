@@ -25,6 +25,7 @@ class Simulation:
 			vrep.simxGetObjectFloatParameter(self.id, handle,
 				vrep.sim_jointfloatparam_velocity, vrep.simx_opmode_streaming)
 		self.distances = {}
+		self.dummies = {}
 
 	def close(self):
 		self.stop()
@@ -87,6 +88,10 @@ class Simulation:
 			vrep.simx_opmode_blocking)
 		vrep.simxReadDistance(self.id, self.distances[name],
 			vrep.simx_opmode_streaming)
+
+	def registerDummyObject(self, name):
+		_, self.dummies[name] = vrep.simxGetObjectHandle(self.id, name,
+			vrep.simx_opmode_blocking)
 
 	def setJointVelocities(self, vels):
 		vels *= self.robot['speed-override']
