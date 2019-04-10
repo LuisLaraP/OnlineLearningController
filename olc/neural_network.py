@@ -7,6 +7,7 @@ class NeuralNetwork:
 		self.inputs = None
 		self.output = None
 		self.parameters = []
+		self.summaries = None
 
 	def getParameters(self):
 		session = tf.get_default_session()
@@ -25,11 +26,13 @@ class NeuralNetwork:
 
 def buildNetwork(name, specs, inputs):
 	model = NeuralNetwork()
+	model.summaries = []
 	model.inputs = inputs
 	with tf.variable_scope(name):
 		for i, layer in enumerate(specs):
 			funcName = '_{}Layer'.format(layer['type'])
 			globals()[funcName](i, layer, model)
+	model.summaries = tf.summary.merge(model.summaries)
 	return model
 
 
@@ -47,6 +50,7 @@ def _denseLayer(i, specs, model):
 		initializer=getattr(tf.initializers, specs['initializer'])()
 	))
 	model.output = model.output + model.parameters[-1]
+	model.summaries.append(tf.summary.histogram('z' + str(i), model.output))
 	if specs['activation'] != 'linear':
 		model.output = getattr(tf.nn, specs['activation'])(model.output)
 
