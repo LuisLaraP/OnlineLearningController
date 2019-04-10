@@ -51,8 +51,8 @@ class Controller:
 		self.session = tf.Session().__enter__()
 		self.session.run(tf.global_variables_initializer())
 		episode = 0
-		step = 0
-		while step < self.settings['steps']:
+		self.step = 0
+		while self.step < self.settings['steps']:
 			episode += 1
 			self.noise.reset()
 			lastState = None
@@ -60,9 +60,9 @@ class Controller:
 			reward = None
 			state = self.env.reset()
 			reset = False
-			while not reset and step < self.settings['steps']:
+			while not reset and self.step < self.settings['steps']:
 				startTime = time.time()
-				step += 1
+				self.step += 1
 				state, reward, reset, info = self.env.getState()
 				if lastState is not None:
 					self.replayBuffer.storeTransition(lastState, action, reward, state, reset)
@@ -72,25 +72,27 @@ class Controller:
 				self.env.act(action)
 				loss = self._train()
 				self._updateTargetNetworks()
-				self.logger.logScalar('Loss', loss, step)
+				self.logger.logScalar('Loss', loss, self.step)
 				for i in range(len(action)):
-					self.logger.logScalar('Action/Axis {}'.format(i + 1), action[i], step)
-				self.logger.logScalar('Action value', actionValue, step)
-				self.logger.logScalar('Reward', reward, step)
-				self.logger.logScalar('Error', info['error'], step)
-				self.logger.logScalar('Error rate', info['error_diff'] / self.settings['timestep'], step)
+					self.logger.logScalar('Action/Axis {}'.format(i + 1), action[i], self.step)
+				self.logger.logScalar('Action value', actionValue, self.step)
+				self.logger.logScalar('Reward', reward, self.step)
+				self.logger.logScalar('Error', info['error'], self.step)
+				self.logger.logScalar('Error rate', info['error_diff'] / self.settings['timestep'], self.step)
 				activeTime = time.time() - startTime
 				sleepTime = self.settings['timestep'] - activeTime
 				if sleepTime > 0:
 					time.sleep(sleepTime)
 				totalTime = (time.time() - startTime) * 1000
-				self.logger.logScalar('Active time', activeTime * 1000, step)
-				self.logger.logScalar('Sampling time', totalTime, step)
+				self.logger.logScalar('Active time', activeTime * 1000, self.step)
+				self.logger.logScalar('Sampling time', totalTime, self.step)
 
 	def _learnedPolicy(self, state):
-		return self.session.run(self.actor.output, {
+		action, sums = self.session.run([self.actor.output, self.actor.summaries], {
 			self.state: [state]
-		})[0]
+		})
+		self.logger.writeSummary(sums, self.step)
+		return action[0]
 
 	def _randomPolicy(self, _):
 		return self.noise.step()
