@@ -92,7 +92,7 @@ class Controller:
 			self.state: [state]
 		})
 		self.logger.writeSummary(sums, self.step)
-		return action[0]
+		return np.clip(action[0], -1, 1)
 
 	def _randomPolicy(self, _):
 		return self.noise.step()

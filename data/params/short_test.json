@@ -24,7 +24,7 @@
 		{
 			"type": "dense",
 			"units": 6,
-			"activation": "tanh",
+			"activation": "linear",
 			"initializer": "lecun_uniform"
 		}
 	],
