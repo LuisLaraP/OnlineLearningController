@@ -57,7 +57,10 @@ class Reach:
 		self.sim.close()
 
 	def reset(self):
+		newRef = np.random.uniform(self.sim.robot['workspace-min'],
+			self.sim.robot['workspace-max'])
 		self.sim.stop()
+		self.sim.setDummyPosition(self.settings['target-object-name'], newRef)
 		self.sim.start()
 		time.sleep(0.2)
 		self.reference = self.sim.getDummyPosition(self.settings['target-object-name'])
