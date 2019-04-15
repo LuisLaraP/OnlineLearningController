@@ -126,23 +126,25 @@ class Controller:
 		)
 
 	def _train(self):
-		s0, a, r, sf, _ = self.replayBuffer.sample(self.settings['batch-size'])
+		s0, a, r, sf, term = self.replayBuffer.sample(self.settings['batch-size'])
+		nt = np.logical_not(term)
+		labels = np.reshape(r, (len(r), 1))
 		loss = 0
 		if len(s0) > 0:
 			actions = self.session.run(self.actorTarget.output, {
-				self.state: sf
+				self.state: sf[nt]
 			})
 			returns = self.session.run(self.criticTarget.output, {
-				self.state: sf,
+				self.state: sf[nt],
 				self.action: actions
 			})
-			labels = np.reshape(r, (len(r), 1)) + self.settings['gamma'] * returns
-			returns = self.session.run([self.trainActor, self.trainCritic, self.loss], {
+			labels[nt] += self.settings['gamma'] * returns
+			ret = self.session.run([self.trainActor, self.trainCritic, self.loss], {
 				self.state: s0,
 				self.action: np.zeros((len(sf), 6)),
 				self.labels: labels
 			})
-			loss = returns[-1]
+			loss = ret[-1]
 		return loss
 
 	def _updateTargetNetworks(self):

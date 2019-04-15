@@ -3,6 +3,8 @@
 import collections
 import random
 
+import numpy as np
+
 
 class ReplayBuffer:
 	"""Storage for previously seen transitions.
@@ -76,4 +78,4 @@ class ReplayBuffer:
 		rewardList = [self.reward[x] for x in idx]
 		fStateList = [self.fState[x] for x in idx]
 		terminalList = [self.terminal[x] for x in idx]
-		return iStateList, actionList, rewardList, fStateList, terminalList
+		return np.array(iStateList), np.array(actionList), np.array(rewardList), np.array(fStateList), np.array(terminalList, dtype=bool)
