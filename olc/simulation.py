@@ -104,6 +104,11 @@ class Simulation:
 		vrep.simxSetObjectPosition(self.id, self.dummies[name], -1, position,
 			vrep.simx_opmode_blocking)
 
+	def setJointPositions(self, positions):
+		for i in range(len(self.joints)):
+			vrep.simxSetJointPosition(self.id, self.joints[i], positions[i],
+				vrep.simx_opmode_oneshot)
+
 	def setJointVelocities(self, vels):
 		vels *= self.robot['speed-override']
 		for i in range(len(self.joints)):
