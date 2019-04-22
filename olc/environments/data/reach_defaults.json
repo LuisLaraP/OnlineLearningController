@@ -1,8 +1,6 @@
 {
 	"error-object-name": "Error",
 	"target-object-name": "Reference",
-	"reward-failure": -100,
-	"reward-success": 100,
 	"threshold-failure": 1.0,
 	"threshold-success": 0.05
 }
