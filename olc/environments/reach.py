@@ -57,17 +57,19 @@ class Reach:
 		self.sim.close()
 
 	def reset(self):
-		newRef = np.random.uniform(self.sim.robot['workspace-min'],
+		self.lastError = self.settings['threshold-failure'] + 1
+		while self.lastError > self.settings['threshold-failure']:
+			newRef = np.random.uniform(self.sim.robot['workspace-min'],
 			self.sim.robot['workspace-max'])
-		newPose = np.radians(np.random.uniform(self.sim.robot['joint-min'],
+			newPose = np.radians(np.random.uniform(self.sim.robot['joint-min'],
 			self.sim.robot['joint-max'])) / 2
-		self.sim.stop()
-		self.sim.setJointPositions(newPose)
-		self.sim.setDummyPosition(self.settings['target-object-name'], newRef)
-		self.sim.start()
-		time.sleep(0.2)
-		self.reference = newRef
-		self.lastError = self.sim.readDistance(self.settings['error-object-name'])
+			self.sim.stop()
+			self.sim.setJointPositions(newPose)
+			self.sim.setDummyPosition(self.settings['target-object-name'], newRef)
+			self.sim.start()
+			time.sleep(0.2)
+			self.reference = newRef
+			self.lastError = self.sim.readDistance(self.settings['error-object-name'])
 
 	def getState(self):
 		info = {}
