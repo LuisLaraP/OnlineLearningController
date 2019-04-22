@@ -13,19 +13,22 @@
 			"type": "dense",
 			"units": 400,
 			"activation": "relu",
-			"initializer": "lecun_uniform"
+			"initializer": "lecun_uniform",
+			"batch-normalization": "on"
 		},
 		{
 			"type": "dense",
 			"units": 300,
 			"activation": "relu",
-			"initializer": "lecun_uniform"
+			"initializer": "lecun_uniform",
+			"batch-normalization": "on"
 		},
 		{
 			"type": "dense",
 			"units": 6,
 			"activation": "linear",
-			"initializer": "lecun_uniform"
+			"initializer": "lecun_uniform",
+			"batch-normalization": "on"
 		}
 	],
 	"actor-optimizer": {

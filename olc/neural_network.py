@@ -48,12 +48,32 @@ def _denseLayer(i, specs, model):
 			initializer=getattr(tf.initializers, specs['initializer'])()
 		))
 		model.output = tf.matmul(model.output, model.parameters[-1])
-		model.parameters.append(tf.get_variable(
-			'b',
-			shape=(specs['units']),
-			initializer=getattr(tf.initializers, specs['initializer'])()
-		))
-		model.output = model.output + model.parameters[-1]
+		if 'batch-normalization' in specs and specs['batch-normalization'] == 'on':
+			model.parameters.append(tf.get_variable(
+				'gamma',
+				shape=(specs['units']),
+				initializer=getattr(tf.initializers, specs['initializer'])()
+			))
+			model.parameters.append(tf.get_variable(
+				'beta',
+				shape=(specs['units']),
+				initializer=getattr(tf.initializers, specs['initializer'])()
+			))
+			m, v = tf.nn.moments(model.output, axes=[0])
+			model.output = tf.nn.batch_normalization(model.output,
+				m,
+				v,
+				model.parameters[-1],
+				model.parameters[-2],
+				0.0001
+			)
+		else:
+			model.parameters.append(tf.get_variable(
+				'b',
+				shape=(specs['units']),
+				initializer=getattr(tf.initializers, specs['initializer'])()
+			))
+			model.output = model.output + model.parameters[-1]
 		model.summaries.append(tf.summary.histogram('z', model.output))
 		if specs['activation'] != 'linear':
 			model.output = getattr(tf.nn, specs['activation'])(model.output)
