@@ -60,7 +60,7 @@ class Reach:
 		newRef = np.random.uniform(self.sim.robot['workspace-min'],
 			self.sim.robot['workspace-max'])
 		newPose = np.radians(np.random.uniform(self.sim.robot['joint-min'],
-			self.sim.robot['joint-max']))
+			self.sim.robot['joint-max'])) / 2
 		self.sim.stop()
 		self.sim.setJointPositions(newPose)
 		self.sim.setDummyPosition(self.settings['target-object-name'], newRef)
