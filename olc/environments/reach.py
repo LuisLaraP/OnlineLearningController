@@ -71,6 +71,7 @@ class Reach:
 			time.sleep(0.2)
 			self.reference = newRef
 			self.lastError = self.sim.readDistance(self.settings['error-object-name'])
+			self.state = np.concatenate((self.reference, newPose, np.zeros(self.action_space.low.shape)))
 
 	def getState(self):
 		info = {}
@@ -81,17 +82,16 @@ class Reach:
 		dError = error - self.lastError
 		self.lastError = error
 		info['error_diff'] = dError
-		state = np.concatenate((self.reference, pos, vel))
-		state = np.divide(state - self.observation_space.low,
+		self.state = np.concatenate((self.reference, pos, vel))
+		self.state = np.divide(self.state - self.observation_space.low,
 			self.observation_space.high - self.observation_space.low)
 		reward = self._computeReward(error, dError)
 		if error <= self.settings['threshold-success'] or error >= self.settings['threshold-failure']:
 			reset = True
 		else:
 			reset = False
-		return state, reward, reset, info
+		return self.state, reward, reset, info
 
 	def _computeReward(self, e, de):
-		propTerm = self.settings['kp'] * (self.settings['threshold-success'] - e)
-		diffTerm = -self.settings['kd'] * de
-		return propTerm + diffTerm
+		dof = self.action_space.low.size
+		return np.sign(de) - 10 * np.linalg.norm(self.state[-dof:])
