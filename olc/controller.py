@@ -139,9 +139,12 @@ class Controller:
 				self.action: actions
 			})
 			labels[nt] += self.settings['gamma'] * returns
+			actions = self.session.run(self.actorTarget.output, {
+				self.state: s0
+			})
 			ret = self.session.run([self.trainActor, self.trainCritic, self.loss], {
 				self.state: s0,
-				self.action: np.zeros((len(sf), 6)),
+				self.action: actions,
 				self.labels: labels
 			})
 			loss = ret[-1]
