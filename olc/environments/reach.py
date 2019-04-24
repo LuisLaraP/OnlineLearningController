@@ -40,17 +40,16 @@ class Reach:
 		)
 		self.observation_space = Box(
 			self.sim.robot['workspace-min']
-			+ [radians(x) for x in self.sim.robot['joint-min']]
-			+ [0] * len(self.sim.robot['max-velocities']),
+			+ [radians(x) for x in self.sim.robot['joint-min']],
 			self.sim.robot['workspace-max']
 			+ [radians(x) for x in self.sim.robot['joint-max']]
-			+ [radians(x) for x in self.sim.robot['max-velocities']]
 		)
 		self.sim.registerDistanceObject(self.settings['error-object-name'])
 		self.sim.registerDummyObject(self.settings['target-object-name'])
 		self.lastError = None
 
 	def act(self, action):
+		self.action = action
 		self.sim.setJointVelocities(self.action_space.scale(action))
 
 	def close(self):
@@ -71,18 +70,18 @@ class Reach:
 			time.sleep(0.2)
 			self.reference = newRef
 			self.lastError = self.sim.readDistance(self.settings['error-object-name'])
-			self.state = np.concatenate((self.reference, newPose, np.zeros(self.action_space.low.shape)))
+		self.state = np.concatenate((self.reference, newPose))
+		self.action = np.zeros(self.action_space.low.shape)
 
 	def getState(self):
 		info = {}
 		pos = self.sim.getJointPositions()
-		vel = self.sim.getJointVelocities()
 		error = self.sim.readDistance(self.settings['error-object-name'])
 		info['error'] = error
 		dError = error - self.lastError
 		self.lastError = error
 		info['error_diff'] = dError
-		self.state = np.concatenate((self.reference, pos, vel))
+		self.state = np.concatenate((self.reference, pos))
 		self.state = np.divide(self.state - self.observation_space.low,
 			self.observation_space.high - self.observation_space.low)
 		reward = self._computeReward(error, dError)
@@ -93,5 +92,4 @@ class Reach:
 		return self.state, reward, reset, info
 
 	def _computeReward(self, e, de):
-		dof = self.action_space.low.size
-		return np.sign(de) - 10 * np.linalg.norm(self.state[-dof:])
+		return np.sign(de) - np.linalg.norm(self.action)
