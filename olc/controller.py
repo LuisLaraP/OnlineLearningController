@@ -77,6 +77,7 @@ class Controller:
 					self.logger.logScalar('Action/Axis {}'.format(i + 1), action[i], self.step)
 				self.logger.logScalar('Action value', actionValue, self.step)
 				self.logger.logScalar('Reward', reward, self.step)
+				self.logger.logScalar('Results', info['lastResult'], self.step)
 				self.logger.logScalar('Error', info['error'], self.step)
 				self.logger.logScalar('Error rate', info['error_diff'] / self.settings['timestep'], self.step)
 				activeTime = time.time() - startTime

@@ -74,7 +74,7 @@ class Reach:
 		self.action = np.zeros(self.action_space.low.shape)
 
 	def getState(self):
-		info = {}
+		info = {'lastResult': 0}
 		pos = self.sim.getJointPositions()
 		error = self.sim.readDistance(self.settings['error-object-name'])
 		info['error'] = error
@@ -85,10 +85,15 @@ class Reach:
 		self.state = np.divide(self.state - self.observation_space.low,
 			self.observation_space.high - self.observation_space.low)
 		reward = self._computeReward(error, dError)
-		if error <= self.settings['threshold-success'] or error >= self.settings['threshold-failure']:
+		if error <= self.settings['threshold-success']:
 			reset = True
+			info['lastResult'] = 1
+		elif error >= self.settings['threshold-failure']:
+			reset = True
+			info['lastResult'] = -1
 		else:
 			reset = False
+			info['lastResult'] = 0
 		return self.state, reward, reset, info
 
 	def _computeReward(self, e, de):
