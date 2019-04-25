@@ -70,8 +70,10 @@ class Reach:
 			time.sleep(0.2)
 			self.reference = newRef
 			self.lastError = self.sim.readDistance(self.settings['error-object-name'])
-		self.state = np.concatenate((self.reference, newPose))
 		self.action = np.zeros(self.action_space.low.shape)
+		self.state = np.concatenate((self.reference, newPose))
+		self.lastPos = self.state[-self.action_space.low.size:]
+		self.blockCount = 0
 
 	def getState(self):
 		info = {'lastResult': 0}
@@ -84,11 +86,12 @@ class Reach:
 		self.state = np.concatenate((self.reference, pos))
 		self.state = np.divide(self.state - self.observation_space.low,
 			self.observation_space.high - self.observation_space.low)
+		stall = self._detectBlock()
 		reward = self._computeReward(error, dError)
 		if error <= self.settings['threshold-success']:
 			reset = True
 			info['lastResult'] = 1
-		elif error >= self.settings['threshold-failure']:
+		elif error >= self.settings['threshold-failure'] or stall:
 			reset = True
 			info['lastResult'] = -1
 		else:
@@ -98,3 +101,16 @@ class Reach:
 
 	def _computeReward(self, e, de):
 		return np.sign(de) - np.linalg.norm(self.action)
+
+	def _detectBlock(self):
+		curPos = self.state[-self.action_space.low.size:]
+		if np.count_nonzero(np.isclose(curPos, self.lastPos, atol=1e-3)) >= 3:
+			self.blockCount += 1
+			if self.blockCount == 10:
+				self.blockCount = 0
+				self.lastPos = curPos
+				return True
+		else:
+			self.blockCount = 0
+			self.lastPos = curPos
+			return False
