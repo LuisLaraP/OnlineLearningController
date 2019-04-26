@@ -48,10 +48,6 @@ class Reach:
 		self.sim.registerDummyObject(self.settings['target-object-name'])
 		self.lastError = None
 
-	def act(self, action):
-		self.action = action
-		self.sim.setJointVelocities(self.action_space.scale(action))
-
 	def close(self):
 		self.sim.close()
 
@@ -74,8 +70,15 @@ class Reach:
 		self.state = np.concatenate((self.reference, newPose))
 		self.lastPos = self.state[-self.action_space.low.size:]
 		self.blockCount = 0
+		return self.state
 
-	def getState(self):
+	def render(self):
+		pass
+
+	def step(self, action):
+		self.action = action
+		self.sim.setJointVelocities(self.action_space.scale(action))
+		time.sleep(0.05)
 		info = {'lastResult': 0}
 		pos = self.sim.getJointPositions()
 		error = self.sim.readDistance(self.settings['error-object-name'])

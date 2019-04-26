@@ -55,7 +55,7 @@ class Controller:
 		while self.step < self.settings['steps']:
 			episode += 1
 			self.noise.reset()
-			lastState = None
+			newState = None
 			action = None
 			reward = None
 			state = self.env.reset()
@@ -63,13 +63,12 @@ class Controller:
 			while not reset and self.step < self.settings['steps']:
 				startTime = time.time()
 				self.step += 1
-				state, reward, reset, info = self.env.getState()
-				if lastState is not None:
-					self.replayBuffer.storeTransition(lastState, action, reward, state, reset)
-				lastState = state
+				self.env.render()
 				action = self._learnedPolicy(state)
+				newState, reward, reset, info = self.env.step(action)
+				self.replayBuffer.storeTransition(state, action, reward, newState, reset)
+				state = newState
 				actionValue = self.session.run(self.critic.output, {self.state: [state], self.action: [action]})
-				self.env.act(action)
 				loss = self._train()
 				self._updateTargetNetworks()
 				self.logger.logScalar('Loss', loss, self.step)
@@ -80,12 +79,7 @@ class Controller:
 				self.logger.logScalar('Results', info['lastResult'], self.step)
 				self.logger.logScalar('Error', info['error'], self.step)
 				self.logger.logScalar('Error rate', info['error_diff'] / self.settings['timestep'], self.step)
-				activeTime = time.time() - startTime
-				sleepTime = self.settings['timestep'] - activeTime
-				if sleepTime > 0:
-					time.sleep(sleepTime)
 				totalTime = (time.time() - startTime) * 1000
-				self.logger.logScalar('Active time', activeTime * 1000, self.step)
 				self.logger.logScalar('Sampling time', totalTime, self.step)
 
 	def _learnedPolicy(self, state):
