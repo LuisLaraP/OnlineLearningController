@@ -70,6 +70,7 @@
 	"critic-lambda": 0.01,
 	"noise": {
 		"name": "Sinusoid",
-		"basePeriod": 2
+		"basePeriod": 2,
+		"dt": 0.05
 	}
 }

@@ -78,7 +78,7 @@ class Reach:
 	def step(self, action):
 		self.action = np.clip(action, -1, 1)
 		self.sim.setJointVelocities(self.action_space.scale(action))
-		time.sleep(0.05)
+		time.sleep(self.settings['timestep'])
 		info = {'lastResult': 0}
 		pos = self.sim.getJointPositions()
 		error = self.sim.readDistance(self.settings['error-object-name'])

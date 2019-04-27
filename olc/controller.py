@@ -32,7 +32,6 @@ class Controller:
 		noiseParams = self.settings['noise']
 		noiseParams.pop('name', None)
 		noiseParams['ndim'] = self.env.action_space.low.size
-		noiseParams['dt'] = self.settings['timestep']
 		self.noise = getattr(olc.noise, noiseName)(**noiseParams)
 		self.replayBuffer = ReplayBuffer(self.settings['replay-buffer-size'])
 		self._setupTraining()
