@@ -1,5 +1,3 @@
-import time
-
 import numpy as np
 import tensorflow as tf
 
@@ -55,9 +53,6 @@ class Controller:
 		while self.step < self.settings['steps']:
 			episode += 1
 			self.noise.reset()
-			newState = None
-			action = None
-			reward = None
 			state = self.env.reset()
 			reset = False
 			while not reset and self.step < self.settings['steps']:
@@ -98,8 +93,7 @@ class Controller:
 		criticOptimizer = getattr(tf.train, optName)(**optSettings)
 		self.trainCritic = criticOptimizer.minimize(self.loss, name='train_critic')
 		self.criticGrad = tf.gradients(self.critic.output, self.action,
-			name='critic_gradients'
-		)
+			name='critic_gradients')
 		# Actor
 		self.actorGrad = tf.gradients(self.actor.output, self.actor.parameters,
 			-self.criticGrad[0],
@@ -110,8 +104,7 @@ class Controller:
 		optSettings.pop('name', None)
 		actorOptimizer = getattr(tf.train, optName)(**optSettings)
 		self.trainActor = actorOptimizer.apply_gradients(zip(self.actorGrad, self.actor.parameters),
-			name='train_actor'
-		)
+			name='train_actor')
 
 	def _train(self):
 		s0, a, r, sf, term = self.replayBuffer.sample(self.settings['batch-size'])
