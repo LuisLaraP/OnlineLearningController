@@ -1,23 +1,11 @@
+from olc.environments.simulation import Simulation
 from olc.settings import getDefaults, merge
 
 _registry = {}
 
 
-def make(settings, simulation):
-	"""
-	Create a new instance of the given environment.
-
-	Parameters
-	----------
-	specs : dict
-		Settings to pass to the environment. Must contain the key `name`, and its
-		value determines the environment to load.
-
-	Returns
-	-------
-	env
-		Instance of the environment `name`.
-	"""
+def make(settings):
+	simulation = Simulation(settings['robot'])
 	defs = getDefaults(__name__, settings['name'].lower())
 	mergedSettings = merge(defs, settings)
 	return _registry[settings['name']](mergedSettings, simulation)
