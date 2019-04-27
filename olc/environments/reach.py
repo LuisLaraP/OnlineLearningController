@@ -76,7 +76,7 @@ class Reach:
 		pass
 
 	def step(self, action):
-		self.action = action
+		self.action = np.clip(action, -1, 1)
 		self.sim.setJointVelocities(self.action_space.scale(action))
 		time.sleep(0.05)
 		info = {'lastResult': 0}
