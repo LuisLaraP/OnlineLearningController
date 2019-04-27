@@ -5,6 +5,11 @@ _registry = {}
 
 
 def make(settings):
+	try:
+		import gym
+		return gym.make(settings['name'])
+	except:
+		pass
 	simulation = Simulation(settings['robot'])
 	defs = getDefaults(__name__, settings['name'].lower())
 	mergedSettings = merge(defs, settings)
