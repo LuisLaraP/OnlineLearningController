@@ -61,7 +61,6 @@ class Controller:
 			state = self.env.reset()
 			reset = False
 			while not reset and self.step < self.settings['steps']:
-				startTime = time.time()
 				self.step += 1
 				self.env.render()
 				action = self._learnedPolicy(state)
@@ -79,8 +78,6 @@ class Controller:
 				self.logger.logScalar('Results', info['lastResult'], self.step)
 				self.logger.logScalar('Error', info['error'], self.step)
 				self.logger.logScalar('Error rate', info['error_diff'] / self.settings['timestep'], self.step)
-				totalTime = (time.time() - startTime) * 1000
-				self.logger.logScalar('Sampling time', totalTime, self.step)
 
 	def _learnedPolicy(self, state):
 		action, sums = self.session.run([self.actor.output, self.actor.summaries], {
