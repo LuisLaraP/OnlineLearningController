@@ -68,16 +68,12 @@ class Controller:
 				self.replayBuffer.storeTransition(state, action, reward, newState, reset)
 				state = newState
 				actionValue = self.session.run(self.critic.output, {self.state: [state], self.action: [action]})
-				loss = self._train()
+				self._train()
 				self._updateTargetNetworks()
-				self.logger.logScalar('Loss', loss, self.step)
 				for i in range(len(action)):
-					self.logger.logScalar('Action/Axis {}'.format(i + 1), action[i], self.step)
+					self.logger.logScalar('Action/{}'.format(i + 1), action[i], self.step)
 				self.logger.logScalar('Action value', actionValue, self.step)
 				self.logger.logScalar('Reward', reward, self.step)
-				self.logger.logScalar('Results', info['lastResult'], self.step)
-				self.logger.logScalar('Error', info['error'], self.step)
-				self.logger.logScalar('Error rate', info['error_diff'] / self.settings['timestep'], self.step)
 
 	def _learnedPolicy(self, state):
 		action, sums = self.session.run([self.actor.output, self.actor.summaries], {
@@ -140,7 +136,7 @@ class Controller:
 				self.labels: labels
 			})
 			loss = ret[-1]
-		return loss
+		self.logger.logScalar('Loss', loss, self.step)
 
 	def _updateTargetNetworks(self):
 		actorParams = self.actor.getParameters()
