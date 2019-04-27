@@ -1,7 +1,6 @@
 import argparse
 import datetime
 import json
-import os.path
 
 import olc.environments as envs
 from olc.controller import Controller
@@ -14,33 +13,26 @@ def olc():
 		description='Run an experiment.'
 	)
 	parser.add_argument(
-		'params',
-		help='path to the parameters file.'
-	)
-	parser.add_argument(
-		'task',
-		help='path to the specifications file for the task.'
+		'settings',
+		help='path to the settings file.'
 	)
 	args = parser.parse_args()
 
 	# Read settings
-	with open(args.params, 'r') as paramsFile:
-		params = json.load(paramsFile)
-	with open(args.task, 'r') as taskFile:
-		task = json.load(taskFile)
+	with open(args.settings, 'r') as settingsFile:
+		settings = json.load(settingsFile)
 
 	# Create environment
-	environment = envs.make(task)
+	environment = envs.make(settings['task'])
 
 	# Create logger
 	time = datetime.datetime.now().time()
-	logDir = os.path.splitext(os.path.basename(args.task))[0]
-	logDir = 'logs/{}-{:%H:%M}'.format(logDir, time)
+	logDir = 'logs/{}-{:%H:%M}'.format(settings['task']['name'], time)
 	logger = Logger(logDir)
 
 	# Create controller
 	defParams = getDefaults(__name__, 'params')
-	mergedParams = merge(defParams, params)
+	mergedParams = merge(defParams, settings)
 	controller = Controller(mergedParams, environment, logger)
 
 	# Run
