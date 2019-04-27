@@ -57,7 +57,7 @@ class Controller:
 			while not reset and self.step < self.settings['steps']:
 				self.step += 1
 				self.env.render()
-				action = self._learnedPolicy(state)
+				action = self._learnedPolicy(state) + self._randomPolicy(state)
 				newState, reward, reset, info = self.env.step(action)
 				self.replayBuffer.storeTransition(state, action, reward, newState, reset)
 				state = newState
