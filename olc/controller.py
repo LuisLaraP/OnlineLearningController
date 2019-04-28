@@ -47,6 +47,8 @@ class Controller:
 		"""
 		self.session = tf.Session().__enter__()
 		self.session.run(tf.global_variables_initializer())
+		self.actorTarget.setParameters(self.actor.getParameters())
+		self.criticTarget.setParameters(self.critic.getParameters())
 		episode = 0
 		self.step = 0
 		while self.step < self.settings['steps']:
@@ -119,7 +121,7 @@ class Controller:
 				self.action: actions
 			})
 			labels[nt] += self.settings['gamma'] * returns
-			actions = self.session.run(self.actorTarget.output, {
+			actions = self.session.run(self.actor.output, {
 				self.state: s0
 			})
 			ret = self.session.run([self.trainActor, self.trainCritic, self.loss], {
