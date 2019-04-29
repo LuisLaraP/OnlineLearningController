@@ -1,8 +1,5 @@
 {
 	"steps": 10000000,
-	"batch-size": 64,
-	"gamma": 0.99,
-	"tau": 0.001,
 	"replay-buffer-size": 1000000,
 	"actor": [
 		{
@@ -31,10 +28,6 @@
 			"batch-normalization": "on"
 		}
 	],
-	"actor-optimizer": {
-		"name": "Adam",
-		"learning_rate": 0.0001
-	},
 	"critic": [
 		{
 			"type": "input",
@@ -63,17 +56,6 @@
 			"initializer": "lecun_uniform"
 		}
 	],
-	"critic-optimizer": {
-		"name": "Adam",
-		"learning_rate": 0.001
-	},
-	"critic-lambda": 0.01,
-	"noise": {
-		"name": "OrnsteinUhlenbeck",
-		"dt": 1,
-		"theta": 0.15,
-		"sigma": 0.2
-	},
 	"task": {
 		"name": "Reacher-v2"
 	}

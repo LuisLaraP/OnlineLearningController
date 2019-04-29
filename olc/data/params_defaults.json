@@ -1,3 +1,21 @@
 {
-	"replay-buffer-size": 100
+	"batch-size": 64,
+	"gamma": 0.99,
+	"replay-buffer-size": 100,
+	"tau": 0.001,
+	"actor-optimizer": {
+		"name": "Adam",
+		"learning_rate": 0.0001
+	},
+	"critic-lambda": 0.01,
+	"critic-optimizer": {
+		"name": "Adam",
+		"learning_rate": 0.001
+	},
+	"noise": {
+		"name": "OrnsteinUhlenbeck",
+		"dt": 1,
+		"theta": 0.15,
+		"sigma": 0.2
+	}
 }
