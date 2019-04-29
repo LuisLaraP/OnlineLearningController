@@ -17,5 +17,6 @@
 		"dt": 1,
 		"theta": 0.15,
 		"sigma": 0.2
-	}
+	},
+	"noise-scale": 0.1
 }
