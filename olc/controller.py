@@ -63,6 +63,8 @@ class Controller:
 				self.env.render()
 				action = self._learnedPolicy(state) + self._randomPolicy(state)
 				newState, reward, reset, info = self.env.step(action)
+				if reset:
+					reward = 0
 				self.replayBuffer.storeTransition(state, action, reward, newState, reset)
 				state = newState
 				actionValue = self.session.run(self.critic.output, {self.state: [state], self.action: [action]})
