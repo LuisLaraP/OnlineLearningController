@@ -100,6 +100,7 @@ class Controller:
 			-self.criticGrad[0],
 			name='actor_gradients'
 		)
+		self.actorGrad = [x / self.settings['batch-size'] for x in self.actorGrad]
 		optName = self.settings['actor-optimizer']['name'] + 'Optimizer'
 		optSettings = self.settings['actor-optimizer']
 		optSettings.pop('name', None)
