@@ -24,7 +24,7 @@ class NeuralNetwork:
 			self.parameters[i].load(tau * values[i] + (1 - tau) * oldValues[i])
 
 
-def buildNetwork(name, specs, inputs):
+def buildNetwork(name, specs, inputs, scaleLow=None, scaleHigh=None):
 	model = NeuralNetwork()
 	model.summaries = []
 	model.inputs = inputs
@@ -35,6 +35,8 @@ def buildNetwork(name, specs, inputs):
 			globals()[funcName](i, layer, model)
 			if layer['type'] != 'input':
 				i += 1
+		if scaleLow is not None and scaleHigh is not None:
+			model.output = (model.output * (scaleHigh - scaleLow) + (scaleHigh + scaleLow)) / 2.0
 	model.summaries = tf.summary.merge(model.summaries)
 	return model
 

@@ -24,8 +24,10 @@ class Controller:
 		)
 		actorInputs = {'state': self.state}
 		criticInputs = {'action': self.action, 'state': self.state}
-		self.actor = buildNetwork('actor', self.settings['actor'], actorInputs)
-		self.actorTarget = buildNetwork('actor_target', self.settings['actor'], actorInputs)
+		self.actor = buildNetwork('actor', self.settings['actor'], actorInputs,
+			scaleLow=self.env.action_space.low, scaleHigh=self.env.action_space.high)
+		self.actorTarget = buildNetwork('actor_target', self.settings['actor'], actorInputs,
+			scaleLow=self.env.action_space.low, scaleHigh=self.env.action_space.high)
 		self.critic = buildNetwork('critic', self.settings['critic'], criticInputs)
 		self.criticTarget = buildNetwork('critic_target', self.settings['critic'], criticInputs)
 		noiseName = self.settings['noise']['name']
