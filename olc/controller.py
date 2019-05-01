@@ -22,6 +22,7 @@ class Controller:
 			(None, self.env.observation_space.low.size),
 			name='state'
 		)
+		self.isTraining = tf.placeholder_with_default(False, None, 'is_training')
 		actorInputs = {'state': self.state}
 		criticInputs = {'action': self.action, 'state': self.state}
 		self.actor = buildNetwork('actor', self.settings['actor'], actorInputs,
@@ -132,7 +133,8 @@ class Controller:
 			ret = self.session.run([self.trainActor, self.trainCritic, self.loss], {
 				self.state: s0,
 				self.action: actions,
-				self.labels: labels
+				self.labels: labels,
+				self.isTraining: True
 			})
 			loss = ret[-1]
 		self.logger.logScalar('Loss', loss, self.step)

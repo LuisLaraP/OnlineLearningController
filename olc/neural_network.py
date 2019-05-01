@@ -51,24 +51,9 @@ def _denseLayer(i, specs, model):
 		))
 		model.output = tf.matmul(model.output, model.parameters[-1])
 		if 'batch-normalization' in specs and specs['batch-normalization'] == 'on':
-			model.parameters.append(tf.get_variable(
-				'gamma',
-				shape=(specs['units']),
-				initializer=getattr(tf.initializers, specs['initializer'])()
-			))
-			model.parameters.append(tf.get_variable(
-				'beta',
-				shape=(specs['units']),
-				initializer=getattr(tf.initializers, specs['initializer'])()
-			))
-			m, v = tf.nn.moments(model.output, axes=[0])
-			model.output = tf.nn.batch_normalization(model.output,
-				m,
-				v,
-				model.parameters[-1],
-				model.parameters[-2],
-				0.0001
-			)
+			layer = tf.keras.layers.BatchNormalization()
+			model.output = layer(model.output, training=tf.get_default_graph().get_tensor_by_name('is_training:0'))
+			model.parameters.extend(layer.trainable_variables)
 		else:
 			model.parameters.append(tf.get_variable(
 				'b',
