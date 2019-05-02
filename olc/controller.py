@@ -54,6 +54,7 @@ class Controller:
 		self.criticTarget.setParameters(self.critic.getParameters())
 		episode = 0
 		self.step = 0
+		self.logger.checkpoint(self.step)
 		while self.step < self.settings['steps']:
 			episode += 1
 			self.noise.reset()
@@ -75,6 +76,8 @@ class Controller:
 					self.logger.logScalar('Action/{}'.format(i + 1), action[i], self.step)
 				self.logger.logScalar('Action value', actionValue, self.step)
 				self.logger.logScalar('Reward', reward, self.step)
+				if self.step % self.settings['save-interval'] == 0:
+					self.logger.checkpoint(self.step)
 
 	def _learnedPolicy(self, state):
 		action, sums = self.session.run([self.actor.output, self.actor.summaries], {

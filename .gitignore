@@ -1,6 +1,7 @@
 # Files ignored by git
 
 # Project --------------------------------------------------------------------
+checkpoints
 logs
 
 .venv

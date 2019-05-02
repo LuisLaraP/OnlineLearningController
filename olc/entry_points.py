@@ -27,8 +27,8 @@ def olc():
 
 	# Create logger
 	time = datetime.datetime.now().time()
-	logDir = 'logs/{}-{:%H:%M}'.format(settings['task']['name'], time)
-	logger = Logger(logDir)
+	experimentName = '{}-{:%H:%M}'.format(settings['task']['name'], time)
+	logger = Logger(experimentName)
 
 	# Create controller
 	defParams = getDefaults(__name__, 'params')
