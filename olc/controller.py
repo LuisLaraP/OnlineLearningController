@@ -24,6 +24,8 @@ class Controller:
 		self.criticTarget = Critic('critic_target', self.action, self.state, self.isTraining)
 		self.actor.createTrainOps(self.actionGrads, self.settings['batch-size'])
 		self.critic.createTrainOps(self.qLabels)
+		self.actorTarget.createUpdateOps(self.settings['tau'], self.actor.parameters)
+		self.criticTarget.createUpdateOps(self.settings['tau'], self.critic.parameters)
 		self.logger.logGraph()
 
 	def run(self):

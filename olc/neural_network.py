@@ -38,6 +38,12 @@ class Actor:
 			optimizer = tf.train.AdamOptimizer(1e-4)
 			self.train = optimizer.apply_gradients(zip(self.gradient, self.parameters))
 
+	def createUpdateOps(self, tau, actorParams):
+		with tf.variable_scope('update_actor_target'):
+			self.update = []
+			for old, new in zip(self.parameters, actorParams):
+				self.update.append(tf.assign(new, new * tau + old * (1 - tau)))
+
 
 class Critic:
 
@@ -75,3 +81,9 @@ class Critic:
 			loss += sum([tf.nn.l2_loss(x) for x in self.parameters])
 			optimizer = tf.train.AdamOptimizer(1e-3)
 			self.train = optimizer.minimize(loss)
+
+	def createUpdateOps(self, tau, criticParams):
+		with tf.variable_scope('update_critic_target'):
+			self.update = []
+			for old, new in zip(self.parameters, criticParams):
+				self.update.append(tf.assign(new, new * tau + old * (1 - tau)))
