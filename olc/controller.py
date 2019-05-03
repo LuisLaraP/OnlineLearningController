@@ -1,6 +1,7 @@
 import tensorflow as tf
 
 import olc.noise
+from olc.neural_network import Actor
 from olc.replay_buffer import ReplayBuffer
 
 
@@ -17,6 +18,7 @@ class Controller:
 		self.qLabels = tf.placeholder(tf.float32, (None, 1), name='q_labels')
 		self.actionGrads = tf.placeholder(tf.float32, (None, self.actionDim), name='action_gradients')
 		self.isTraining = tf.placeholder_with_default(False, None, 'is_training')
+		self.actor = Actor('actor', self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
 		self.logger.logGraph()
 
 	def run(self):
