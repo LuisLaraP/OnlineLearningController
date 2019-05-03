@@ -20,6 +20,8 @@ class Controller:
 		self.isTraining = tf.placeholder_with_default(False, None, 'is_training')
 		self.actor = Actor('actor', self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
 		self.critic = Critic('critic', self.action, self.state, self.isTraining)
+		self.actorTarget = Actor('actor_target', self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
+		self.criticTarget = Critic('critic_target', self.action, self.state, self.isTraining)
 		self.logger.logGraph()
 
 	def run(self):
