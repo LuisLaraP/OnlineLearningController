@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 import olc.noise
-from olc.neural_network import Actor
+from olc.neural_network import Actor, Critic
 from olc.replay_buffer import ReplayBuffer
 
 
@@ -19,6 +19,7 @@ class Controller:
 		self.actionGrads = tf.placeholder(tf.float32, (None, self.actionDim), name='action_gradients')
 		self.isTraining = tf.placeholder_with_default(False, None, 'is_training')
 		self.actor = Actor('actor', self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
+		self.critic = Critic('critic', self.action, self.state, self.isTraining)
 		self.logger.logGraph()
 
 	def run(self):
