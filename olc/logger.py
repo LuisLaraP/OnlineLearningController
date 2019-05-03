@@ -15,6 +15,7 @@ class Logger:
 
 	def logGraph(self):
 		self.writer.add_graph(tf.get_default_graph())
+		self.writer.flush()
 
 	def logScalar(self, name, value, step):
 		summary = tf.Summary(value=[tf.Summary.Value(tag=name, simple_value=value)])
