@@ -65,6 +65,7 @@ class Controller:
 				self.buffer.storeTransition(state, action, reward, newState, done)
 				state = newState
 				self._train(step)
+				self.session.run([self.actorTarget.update, self.criticTarget.update])
 				episodeReward += reward
 				[self.logger.logScalar('Action/' + str(i), x, step) for i, x in enumerate(action)]
 				self.logger.logScalar('Reward', reward, step)

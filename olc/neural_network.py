@@ -42,7 +42,7 @@ class Actor:
 		with tf.variable_scope('update_actor_target'):
 			self.update = []
 			for old, new in zip(self.parameters, actorParams):
-				self.update.append(tf.assign(new, new * tau + old * (1 - tau)))
+				self.update.append(tf.assign(old, new * tau + old * (1 - tau)))
 
 
 class Critic:
@@ -87,4 +87,4 @@ class Critic:
 		with tf.variable_scope('update_critic_target'):
 			self.update = []
 			for old, new in zip(self.parameters, criticParams):
-				self.update.append(tf.assign(new, new * tau + old * (1 - tau)))
+				self.update.append(tf.assign(old, new * tau + old * (1 - tau)))
