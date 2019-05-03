@@ -77,10 +77,10 @@ class Critic:
 
 	def createTrainOps(self, labels):
 		with tf.variable_scope('train_critic'):
-			loss = tf.losses.mean_squared_error(labels, self.output)
-			loss += sum([tf.nn.l2_loss(x) for x in self.parameters])
+			self.loss = tf.losses.mean_squared_error(labels, self.output)
+			self.loss += sum([tf.nn.l2_loss(x) for x in self.parameters])
 			optimizer = tf.train.AdamOptimizer(1e-3)
-			self.train = optimizer.minimize(loss)
+			self.train = optimizer.minimize(self.loss)
 
 	def createUpdateOps(self, tau, criticParams):
 		with tf.variable_scope('update_critic_target'):

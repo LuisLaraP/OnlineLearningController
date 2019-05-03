@@ -16,7 +16,7 @@
 	},
 	"noise": {
 		"name": "OrnsteinUhlenbeck",
-		"dt": 1,
+		"dt": 1e-2,
 		"theta": 0.15,
 		"sigma": 0.2
 	},

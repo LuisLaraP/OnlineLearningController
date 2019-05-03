@@ -1,7 +1,8 @@
+import numpy as np
 import tensorflow as tf
 
-import olc.noise
 from olc.neural_network import Actor, Critic
+from olc.noise import OrnsteinUhlenbeck
 from olc.replay_buffer import ReplayBuffer
 
 
@@ -29,39 +30,73 @@ class Controller:
 		self.logger.logGraph()
 
 	def run(self):
-		session = tf.Session()
-		session.run(tf.global_variables_initializer())
+		self.session = tf.Session()
+		self.session.run(tf.global_variables_initializer())
 		# Initialize actor target parameters
-		actorParams = session.run(self.actor.parameters)
+		actorParams = self.session.run(self.actor.parameters)
 		for f, t in zip(actorParams, self.actorTarget.parameters):
-			t.load(f, session)
+			t.load(f, self.session)
 		# Initialize critic target parameters
-		criticParams = session.run(self.critic.parameters)
+		criticParams = self.session.run(self.critic.parameters)
 		for f, t in zip(criticParams, self.criticTarget.parameters):
-			t.load(f, session)
+			t.load(f, self.session)
+		# Create replay buffer
+		self.buffer = ReplayBuffer(self.settings['replay-buffer-size'])
+		# Create noise process
+		self.noise = OrnsteinUhlenbeck(self.actionDim,
+			self.settings['noise']['dt'],
+			self.settings['noise']['theta'],
+			self.settings['noise']['sigma']
+		)
 		# Training
 		step = 0
 		for episode in range(1, self.settings['episodes'] + 1):
 			done = False
 			episodeReward = 0
+			self.noise.reset()
 			state = self.env.reset()
 			while not done:
 				step += 1
 				self.env.render()
-				action = [0]
-				state, reward, done, _ = self.env.step(action)
+				action = self._learnedPolicy(state) + self._randomPolicy(state)
+				newState, reward, done, _ = self.env.step(action)
+				if done:
+					reward = 0
+				self.buffer.storeTransition(state, action, reward, newState, done)
+				state = newState
+				self._train(step)
 				episodeReward += reward
-				[self.logger.logScalar('Action/' + str(x), x, step) for x in action]
+				[self.logger.logScalar('Action/' + str(i), x, step) for i, x in enumerate(action)]
 				self.logger.logScalar('Reward', reward, step)
 			self.logger.logScalar('Learning curve', episodeReward, episode)
 			print('Episode {}:\tReward:{}'.format(episode, episodeReward))
 
 	def _learnedPolicy(self, state):
-		action, sums = self.session.run([self.actor.output, self.actor.summaries], {
+		action = self.session.run(self.actor.output, {
 			self.state: [state]
 		})
-		self.logger.writeSummary(sums, self.step)
 		return action[0]
 
 	def _randomPolicy(self, _):
 		return self.noise.step() * (self.env.action_space.high - self.env.action_space.low) * self.settings['noise-scale']
+
+	def _train(self, step):
+		siBatch, aBatch, rBatch, sfBatch, tBatch = self.buffer.sample(self.settings['batch-size'])
+		loss = 0
+		if len(siBatch) > 0:
+			# Critic
+			actions = self.session.run(self.actorTarget.output, {
+				self.state: sfBatch
+			})
+			qValues = self.session.run(self.criticTarget.output, {
+				self.action: actions,
+				self.state: sfBatch
+			})
+			labels = np.reshape(rBatch, (rBatch.size, 1)) + self.settings['gamma'] * qValues
+			labels[tBatch] = 0
+			_, loss = self.session.run([self.critic.train, self.critic.loss], {
+				self.action: aBatch,
+				self.state: siBatch,
+				self.qLabels: labels
+			})
+		self.logger.logScalar('Critic loss', loss, step)
