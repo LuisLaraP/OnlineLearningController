@@ -29,6 +29,14 @@ class Actor:
 				self.output = tf.keras.layers.Activation('tanh')(self.output)
 			self.output = tf.multiply(self.output, (boundHigh - boundLow) / 2.0)
 			self.output = tf.add(self.output, (boundHigh + boundLow) / 2.0)
+		self.parameters = tf.trainable_variables(scope=name)
+
+	def createTrainOps(self, actionGrad, batchSize):
+		with tf.variable_scope('train_actor'):
+			self.gradient = tf.gradients(self.output, self.parameters, -actionGrad)
+			self.gradient = [x / batchSize for x in self.gradient]
+			optimizer = tf.train.AdamOptimizer(1e-4)
+			self.train = optimizer.apply_gradients(zip(self.gradient, self.parameters))
 
 
 class Critic:
