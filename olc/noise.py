@@ -14,7 +14,7 @@ class OrnsteinUhlenbeck:
 		self.x = np.zeros(self.x.shape)
 
 	def step(self):
-		wiener = np.random.normal(self.mu, self.dt, self.x.shape)
+		wiener = np.random.normal(0, self.dt, self.x.shape)
 		dx = self.theta * (self.mu - self.x) * self.dt + self.sigma * wiener
 		self.x += dx
 		return self.x
