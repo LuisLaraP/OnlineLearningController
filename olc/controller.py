@@ -24,7 +24,7 @@ class Controller:
 		self.actorTarget = Actor('actor_target', self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
 		self.criticTarget = Critic('critic_target', self.action, self.state, self.isTraining)
 		self.actor.createTrainOps(self.actionGrads, self.settings['batch-size'])
-		self.critic.createTrainOps(self.qLabels)
+		self.critic.createTrainOps(self.action, self.qLabels)
 		self.actorTarget.createUpdateOps(self.settings['tau'], self.actor.parameters)
 		self.criticTarget.createUpdateOps(self.settings['tau'], self.critic.parameters)
 		self.logger.logGraph()
@@ -98,5 +98,17 @@ class Controller:
 				self.action: aBatch,
 				self.state: siBatch,
 				self.qLabels: labels
+			})
+			# Actor
+			actions = self.session.run(self.actor.output, {
+				self.state: siBatch
+			})
+			actionGrads = self.session.run(self.critic.actionGrads, {
+				self.action: actions,
+				self.state: siBatch,
+			})[0]
+			self.session.run(self.actor.train, {
+				self.state: siBatch,
+				self.actionGrads: actionGrads
 			})
 		self.logger.logScalar('Critic loss', loss, step)
