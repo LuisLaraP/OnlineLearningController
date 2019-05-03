@@ -29,7 +29,32 @@ class Controller:
 		self.logger.logGraph()
 
 	def run(self):
-		pass
+		session = tf.Session()
+		session.run(tf.global_variables_initializer())
+		# Initialize actor target parameters
+		actorParams = session.run(self.actor.parameters)
+		for f, t in zip(actorParams, self.actorTarget.parameters):
+			t.load(f, session)
+		# Initialize critic target parameters
+		criticParams = session.run(self.critic.parameters)
+		for f, t in zip(criticParams, self.criticTarget.parameters):
+			t.load(f, session)
+		# Training
+		step = 0
+		for episode in range(1, self.settings['episodes'] + 1):
+			done = False
+			episodeReward = 0
+			state = self.env.reset()
+			while not done:
+				step += 1
+				self.env.render()
+				action = [0]
+				state, reward, done, _ = self.env.step(action)
+				episodeReward += reward
+				[self.logger.logScalar('Action/' + str(x), x, step) for x in action]
+				self.logger.logScalar('Reward', reward, step)
+			self.logger.logScalar('Learning curve', episodeReward, episode)
+			print('Episode {}:\tReward:{}'.format(episode, episodeReward))
 
 	def _learnedPolicy(self, state):
 		action, sums = self.session.run([self.actor.output, self.actor.summaries], {
