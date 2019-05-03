@@ -22,6 +22,7 @@ class Controller:
 		self.critic = Critic('critic', self.action, self.state, self.isTraining)
 		self.actorTarget = Actor('actor_target', self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
 		self.criticTarget = Critic('critic_target', self.action, self.state, self.isTraining)
+		self.critic.createTrainOps(self.qLabels)
 		self.logger.logGraph()
 
 	def run(self):

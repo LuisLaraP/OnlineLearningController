@@ -59,3 +59,11 @@ class Critic:
 					bias_initializer=tf.initializers.random_uniform(-3e-3, 3e-3),
 					kernel_initializer=tf.initializers.random_uniform(-3e-3, 3e-3)
 				)(self.output)
+		self.parameters = tf.trainable_variables(scope=name)
+
+	def createTrainOps(self, labels):
+		with tf.variable_scope('train_critic'):
+			loss = tf.losses.mean_squared_error(labels, self.output)
+			loss += sum([tf.nn.l2_loss(x) for x in self.parameters])
+			optimizer = tf.train.AdamOptimizer(1e-3)
+			self.train = optimizer.minimize(loss)
