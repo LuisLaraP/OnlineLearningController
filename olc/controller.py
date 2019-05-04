@@ -48,6 +48,17 @@ class Controller:
 			self.settings['noise']['theta'],
 			self.settings['noise']['sigma']
 		)
+		# Initialize replay buffer
+		state = self.env.reset()
+		for i in range(self.settings['replay-buffer-init']):
+			action = self.env.action_space.sample()
+			newState, reward, done, _ = self.env.step(action)
+			self.buffer.storeTransition(state, action, reward, newState, done)
+			state = newState
+			if done:
+				state = self.env.reset()
+			if i % 1000 == 0:
+				print(i)
 		# Training
 		step = 0
 		for episode in range(1, self.settings['episodes'] + 1):
