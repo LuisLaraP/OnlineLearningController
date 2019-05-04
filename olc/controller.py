@@ -18,7 +18,7 @@ class Controller:
 		self.state = tf.placeholder(tf.float32, (None, self.stateDim), name='state')
 		self.qLabels = tf.placeholder(tf.float32, (None, 1), name='q_labels')
 		self.actionGrads = tf.placeholder(tf.float32, (None, self.actionDim), name='action_gradients')
-		self.isTraining = tf.placeholder_with_default(False, None, 'is_training')
+		self.isTraining = tf.placeholder_with_default(True, None, 'is_training')
 		self.actor = Actor('actor', self.settings['actor'], self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
 		self.critic = Critic('critic', self.settings['critic'], self.action, self.state, self.isTraining)
 		self.actorTarget = Actor('actor_target', self.settings['actor'], self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
@@ -74,7 +74,8 @@ class Controller:
 
 	def _learnedPolicy(self, state):
 		action = self.session.run(self.actor.output, {
-			self.state: [state]
+			self.state: [state],
+			self.isTraining: False
 		})
 		return action[0]
 
