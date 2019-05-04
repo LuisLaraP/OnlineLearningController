@@ -4,7 +4,8 @@ import tensorflow as tf
 
 class Actor:
 
-	def __init__(self, name, state, isTraining, boundHigh, boundLow):
+	def __init__(self, name, specs, state, isTraining, boundHigh, boundLow):
+		self.settings = specs
 		with tf.variable_scope(name):
 			self.output = state
 			with tf.variable_scope('layer_1'):
@@ -35,7 +36,7 @@ class Actor:
 		with tf.variable_scope('train_actor'):
 			self.gradient = tf.gradients(self.output, self.parameters, -actionGrad)
 			self.gradient = [x / batchSize for x in self.gradient]
-			optimizer = tf.train.AdamOptimizer(1e-4)
+			optimizer = tf.train.AdamOptimizer(self.settings['learning-rate'])
 			self.train = optimizer.apply_gradients(zip(self.gradient, self.parameters))
 
 	def createUpdateOps(self, tau, actorParams):
@@ -47,7 +48,8 @@ class Actor:
 
 class Critic:
 
-	def __init__(self, name, action, state, isTraining):
+	def __init__(self, name, specs, action, state, isTraining):
+		self.settings = specs
 		with tf.variable_scope(name):
 			self.output = state
 			with tf.variable_scope('layer_1'):
@@ -80,7 +82,7 @@ class Critic:
 		with tf.variable_scope('train_critic'):
 			self.loss = tf.losses.mean_squared_error(labels, self.output)
 			self.loss += sum([tf.nn.l2_loss(x) for x in self.parameters])
-			optimizer = tf.train.AdamOptimizer(1e-3)
+			optimizer = tf.train.AdamOptimizer(self.settings['learning-rate'])
 			self.train = optimizer.minimize(self.loss)
 
 	def createUpdateOps(self, tau, criticParams):

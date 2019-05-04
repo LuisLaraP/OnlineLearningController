@@ -5,14 +5,14 @@
 	"replay-buffer-size": 1000000,
 	"save-interval": 5000,
 	"tau": 0.001,
-	"actor-optimizer": {
-		"name": "Adam",
-		"learning_rate": 0.0001
+	"actor": {
+		"batch-normalization": true,
+		"learning-rate": 1e-4
 	},
-	"critic-lambda": 0.01,
-	"critic-optimizer": {
-		"name": "Adam",
-		"learning_rate": 0.001
+	"critic": {
+		"batch-normalization": false,
+		"lambda": 0.01,
+		"learning-rate": 1e-3
 	},
 	"noise": {
 		"name": "OrnsteinUhlenbeck",
