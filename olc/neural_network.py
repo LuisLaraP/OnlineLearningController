@@ -106,7 +106,7 @@ class Critic:
 		self.actionGrads = tf.gradients(self.output, action, name='action_gradients')
 		with tf.variable_scope('train_critic'):
 			self.loss = tf.losses.mean_squared_error(labels, self.output)
-			self.loss += sum([tf.nn.l2_loss(x) for x in self.parameters])
+			self.loss += sum([tf.nn.l2_loss(x) for x in self.parameters]) * self.settings['lambda']
 			optimizer = tf.train.AdamOptimizer(self.settings['learning-rate'])
 			self.train = optimizer.minimize(self.loss)
 

@@ -12,7 +12,7 @@
 	},
 	"critic": {
 		"batch-normalization": false,
-		"lambda": 0.0,
+		"lambda": 0.01,
 		"learning-rate": 1e-3
 	},
 	"noise": {
