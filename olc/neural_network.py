@@ -52,12 +52,21 @@ class Critic:
 		self.settings = specs
 		with tf.variable_scope(name):
 			self.output = state
+			if specs['batch-normalization']:
+				self.output = tf.keras.layers.BatchNormalization()(self.output, training=isTraining)
 			with tf.variable_scope('layer_1'):
 				fanIn = self.output.shape[-1].value
-				self.output = tf.keras.layers.Dense(400,
-					bias_initializer=tf.initializers.random_uniform(-1 / np.sqrt(fanIn), 1 / np.sqrt(fanIn)),
-					kernel_initializer=tf.initializers.random_uniform(-1 / np.sqrt(fanIn), 1 / np.sqrt(fanIn))
-				)(self.output)
+				if specs['batch-normalization']:
+					self.output = tf.keras.layers.Dense(400,
+						kernel_initializer=tf.initializers.random_uniform(-1 / np.sqrt(fanIn), 1 / np.sqrt(fanIn)),
+						use_bias=False
+					)(self.output)
+					self.output = tf.keras.layers.BatchNormalization()(self.output, training=isTraining)
+				else:
+					self.output = tf.keras.layers.Dense(400,
+						bias_initializer=tf.initializers.random_uniform(-1 / np.sqrt(fanIn), 1 / np.sqrt(fanIn)),
+						kernel_initializer=tf.initializers.random_uniform(-1 / np.sqrt(fanIn), 1 / np.sqrt(fanIn))
+					)(self.output)
 				self.output = tf.keras.layers.Activation('relu')(self.output)
 			with tf.variable_scope('layer_2'):
 				fanIn = self.output.shape[-1].value
