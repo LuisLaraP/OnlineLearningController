@@ -57,8 +57,6 @@ class Controller:
 			state = newState
 			if done:
 				state = self.env.reset()
-			if i % 1000 == 0:
-				print(i)
 		# Training
 		step = 0
 		for episode in range(1, self.settings['episodes'] + 1):
