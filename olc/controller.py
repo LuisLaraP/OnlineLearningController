@@ -71,8 +71,6 @@ class Controller:
 				self.env.render()
 				action = self._learnedPolicy(state) + self._randomPolicy(state)
 				newState, reward, done, _ = self.env.step(action)
-				if done:
-					reward = 0
 				self.buffer.storeTransition(state, action, reward, newState, done)
 				state = newState
 				self._train(step)
