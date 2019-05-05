@@ -27,7 +27,7 @@ class Actor:
 			with tf.variable_scope('layer_2'):
 				fanIn = self.output.shape[-1].value
 				if specs['batch-normalization']:
-					self.output = tf.keras.layers.Dense(400,
+					self.output = tf.keras.layers.Dense(300,
 						kernel_initializer=tf.initializers.random_uniform(-1 / np.sqrt(fanIn), 1 / np.sqrt(fanIn)),
 						use_bias=False
 					)(self.output)
