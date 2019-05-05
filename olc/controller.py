@@ -89,7 +89,7 @@ class Controller:
 		return action[0]
 
 	def _randomPolicy(self, _):
-		return self.noise.step() * (self.env.action_space.high - self.env.action_space.low) * self.settings['noise-scale']
+		return self.noise.step() * (self.env.action_space.high - self.env.action_space.low)
 
 	def _train(self, step):
 		siBatch, aBatch, rBatch, sfBatch, tBatch = self.buffer.sample(self.settings['batch-size'])
