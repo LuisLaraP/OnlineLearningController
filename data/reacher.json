@@ -1,6 +1,6 @@
 {
 	"task": {
-		"name": "Pendulum-v0"
+		"name": "Reacher-v2"
 	},
 	"episodes": 100
 }
