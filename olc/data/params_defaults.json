@@ -19,6 +19,6 @@
 		"name": "OrnsteinUhlenbeck",
 		"dt": 1,
 		"theta": 0.15,
-		"sigma": 0.3
+		"sigma": 0.2
 	}
 }
