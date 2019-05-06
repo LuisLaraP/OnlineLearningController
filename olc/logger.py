@@ -10,7 +10,7 @@ class Logger:
 
 	def checkpoint(self, session, step):
 		if self.saver is None:
-			self.saver = tf.train.Saver(max_to_keep=None)
+			self.saver = tf.train.Saver(max_to_keep=1024)
 		self.saver.save(session, self.savePath, global_step=step)
 
 	def logGraph(self):

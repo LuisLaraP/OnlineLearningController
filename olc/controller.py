@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np
 import tensorflow as tf
 
@@ -127,3 +129,45 @@ class Controller:
 				self.actionGrads: actionGrads
 			})
 		self.logger.logScalar('Critic loss', loss, step)
+
+
+class Tester:
+
+	def __init__(self, settings, environment, checkpointDir):
+		self.settings = settings
+		self.env = environment
+		self.actionDim = self.env.action_space.low.size
+		self.stateDim = self.env.observation_space.low.size
+		self.action = tf.placeholder(tf.float32, (None, self.actionDim), name='action')
+		self.state = tf.placeholder(tf.float32, (None, self.stateDim), name='state')
+		self.isTraining = tf.placeholder_with_default(False, None, 'is_training')
+		self.actor = Actor('actor', self.settings['actor'], self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
+		self.paths = tf.train.get_checkpoint_state(checkpointDir).all_model_checkpoint_paths
+
+	def run(self):
+		self.saver = tf.train.Saver(var_list=self.actor.parameters)
+		self.session = tf.Session()
+		self.session.run(tf.global_variables_initializer())
+		step = 0
+		for i, path in enumerate(self.paths):
+			self.saver.restore(self.session, path)
+			cumReward = 0
+			print('Test ' + str(i), end='')
+			sys.stdout.flush()
+			for episode in range(5):
+				done = False
+				state = self.env.reset()
+				while not done:
+					step += 1
+					self.env.render()
+					action = self._learnedPolicy(state)
+					state, reward, done, _ = self.env.step(action)
+					cumReward += reward
+			print('\tAvg reward:{}'.format(cumReward / 5))
+
+	def _learnedPolicy(self, state):
+		action = self.session.run(self.actor.output, {
+			self.state: [state],
+			self.isTraining: False
+		})
+		return action[0]
