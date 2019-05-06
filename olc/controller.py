@@ -59,6 +59,7 @@ class Controller:
 				state = self.env.reset()
 		# Training
 		step = 0
+		self.logger.checkpoint(self.session, step)
 		for episode in range(1, self.settings['episodes'] + 1):
 			done = False
 			episodeReward = 0
@@ -75,12 +76,14 @@ class Controller:
 				self.session.run([self.actorTarget.update, self.criticTarget.update])
 				episodeReward += reward
 				actionValue = self.session.run(self.critic.output,
-					{self.action: [action], self.state: [state], self.isTraining=False})
+					{self.action: [action], self.state: [state], self.isTraining: False})
 				[self.logger.logScalar('Action/' + str(i), x, step) for i, x in enumerate(action)]
 				self.logger.logScalar('Action value', actionValue, step)
 				self.logger.logScalar('Reward', reward, step)
 			self.logger.logScalar('Learning curve', episodeReward, episode)
 			print('Episode {}:\tReward:{}'.format(episode, episodeReward))
+			if episode % self.settings['save-interval'] == 0:
+				self.logger.checkpoint(self.session, step)
 
 	def _learnedPolicy(self, state):
 		action = self.session.run(self.actor.output, {

@@ -8,10 +8,10 @@ class Logger:
 		self.saver = None
 		self.savePath = 'checkpoints/' + name + '/step'
 
-	def checkpoint(self, step):
+	def checkpoint(self, session, step):
 		if self.saver is None:
 			self.saver = tf.train.Saver(max_to_keep=None)
-		self.saver.save(tf.get_default_session(), self.savePath, global_step=step)
+		self.saver.save(session, self.savePath, global_step=step)
 
 	def logGraph(self):
 		self.writer.add_graph(tf.get_default_graph())
