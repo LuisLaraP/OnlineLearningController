@@ -2,7 +2,6 @@
 	"episodes": 50000,
 	"batch-size": 64,
 	"gamma": 0.99,
-	"replay-buffer-init": 50000,
 	"replay-buffer-size": 1000000,
 	"save-interval": 20,
 	"tau": 0.001,
