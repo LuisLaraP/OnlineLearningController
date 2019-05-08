@@ -27,7 +27,7 @@ class Simulation:
 			pos[i] = vrep.simxGetJointPosition(self.id, joint, vrep.simx_opmode_buffer)[1]
 			vel[i] = vrep.simxGetObjectFloatParameter(self.id, joint, vrep.sim_jointfloatparam_velocity, vrep.simx_opmode_buffer)[1]
 		vrep.simxPauseCommunication(self.id, False)
-		return np.concatenate((pos, vel))
+		return pos, vel
 
 	def setTorques(self, torques):
 		vrep.simxPauseCommunication(self.id, True)

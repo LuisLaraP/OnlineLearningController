@@ -27,7 +27,7 @@ class Reach:
 
 	def reset(self):
 		self.sim.stop()
-		self.state = np.concatenate((np.zeros(3), self.sim.getRobotState()))
+		self.state = np.concatenate((np.zeros(3),) + self.sim.getRobotState())
 		self.sim.start()
 		return self.state
 
@@ -37,5 +37,5 @@ class Reach:
 	def step(self, action):
 		self.sim.setTorques(action)
 		self.sim.step()
-		self.state = np.concatenate((np.zeros(3), self.sim.getRobotState()))
+		self.state = np.concatenate((np.zeros(3),) + self.sim.getRobotState())
 		return self.state, 0, False, None
