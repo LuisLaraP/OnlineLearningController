@@ -29,9 +29,11 @@ class Reach:
 	def reset(self):
 		self.sim.stop()
 		self.state = self.observation_space.sample()
-		self.state[-len(self.settings['robot']['max-velocities']):] = 0
+		ref = self.state[:len(self.settings['robot']['workspace-min'])]
+		self.sim.setDummyPosition(self.settings['target-object-name'], ref)
 		pose = self.state[len(self.settings['robot']['workspace-min']):-len(self.settings['robot']['max-velocities'])]
 		self.sim.setPose(pose)
+		self.state[-len(self.settings['robot']['max-velocities']):] = 0
 		vels = self.state[-len(self.settings['robot']['max-velocities']):]
 		self.sim.setVelocities(vels)
 		self.sim.start()
