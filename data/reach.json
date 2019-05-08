@@ -1,4 +1,5 @@
 {
+	"episodes": 100,
 	"task": {
 		"name": "Reach",
 		"robot": {

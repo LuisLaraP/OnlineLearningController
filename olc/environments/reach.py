@@ -15,13 +15,15 @@ from gym.spaces import Box
 class Reach:
 
 	def __init__(self, settings, simulation):
+		self.settings = settings
+		self.sim = simulation
 		stateMin = np.concatenate((settings['robot']['workspace-min'], settings['robot']['joint-min']))
 		stateMax = np.concatenate((settings['robot']['workspace-max'], settings['robot']['joint-max']))
 		self.action_space = Box(-np.array(settings['robot']['max-velocities']), np.array(settings['robot']['max-velocities']))
 		self.observation_space = Box(stateMin, stateMax)
 
 	def close(self):
-		pass
+		self.sim.close()
 
 	def reset(self):
 		self.state = np.zeros(self.observation_space.low.size)
@@ -31,4 +33,4 @@ class Reach:
 		pass
 
 	def step(self, action):
-		return self.state, 0, False, None
+		return self.state, 0, True, None
