@@ -26,11 +26,14 @@ class Reach:
 		self.sim.close()
 
 	def reset(self):
+		self.sim.stop()
 		self.state = np.zeros(self.observation_space.low.size)
+		self.sim.start()
 		return self.state
 
 	def render(self):
 		pass
 
 	def step(self, action):
-		return self.state, 0, True, None
+		self.sim.step()
+		return self.state, 0, False, None
