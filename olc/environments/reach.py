@@ -21,6 +21,7 @@ class Reach:
 		stateMax = np.concatenate((settings['robot']['workspace-max'], np.radians(settings['robot']['joint-max']), np.radians(settings['robot']['max-velocities'])))
 		self.action_space = Box(-np.array(settings['robot']['max-torques']), np.array(settings['robot']['max-torques']))
 		self.observation_space = Box(stateMin, stateMax)
+		self.sim.readDistance(self.settings['error-object-name'])
 
 	def close(self):
 		self.sim.close()
@@ -42,5 +43,6 @@ class Reach:
 	def step(self, action):
 		self.sim.setTorques(action)
 		self.sim.step()
+		error = self.sim.readDistance(self.settings['error-object-name'])
 		self.state = np.concatenate((np.zeros(3),) + self.sim.getRobotState())
 		return self.state, 0, False, None

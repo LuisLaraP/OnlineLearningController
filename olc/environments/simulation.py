@@ -14,6 +14,7 @@ class Simulation:
 			self.joints.append(vrep.simxGetObjectHandle(self.id, joint, vrep.simx_opmode_blocking)[1])
 			vrep.simxGetJointPosition(self.id, self.joints[-1], vrep.simx_opmode_streaming)
 			vrep.simxGetObjectFloatParameter(self.id, self.joints[-1], vrep.sim_jointfloatparam_velocity, vrep.simx_opmode_streaming)
+		self.distances = {}
 
 	def close(self):
 		self.stop()
@@ -28,6 +29,16 @@ class Simulation:
 			vel[i] = vrep.simxGetObjectFloatParameter(self.id, joint, vrep.sim_jointfloatparam_velocity, vrep.simx_opmode_buffer)[1]
 		vrep.simxPauseCommunication(self.id, False)
 		return pos, vel
+
+	def readDistance(self, name):
+		if name not in self.distances:
+			code, handle = vrep.simxGetDistanceHandle(self.id, name, vrep.simx_opmode_blocking)
+			if code != 0:
+				exit('Distance object "{}" not found'.format(name))
+			self.distances[name] = handle
+			vrep.simxReadDistance(self.id, self.distances[name], vrep.simx_opmode_streaming)
+			return None
+		return vrep.simxReadDistance(self.id, self.distances[name], vrep.simx_opmode_buffer)[1]
 
 	def setPose(self, pose):
 		vrep.simxPauseCommunication(self.id, True)
