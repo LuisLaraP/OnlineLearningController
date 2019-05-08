@@ -17,8 +17,8 @@ class Reach:
 	def __init__(self, settings, simulation):
 		self.settings = settings
 		self.sim = simulation
-		stateMin = np.concatenate((settings['robot']['workspace-min'], settings['robot']['joint-min'], -np.array(settings['robot']['max-velocities'])))
-		stateMax = np.concatenate((settings['robot']['workspace-max'], settings['robot']['joint-max'], np.array(settings['robot']['max-velocities'])))
+		stateMin = np.concatenate((settings['robot']['workspace-min'], np.radians(settings['robot']['joint-min']), -np.radians(settings['robot']['max-velocities'])))
+		stateMax = np.concatenate((settings['robot']['workspace-max'], np.radians(settings['robot']['joint-max']), np.radians(settings['robot']['max-velocities'])))
 		self.action_space = Box(-np.array(settings['robot']['max-torques']), np.array(settings['robot']['max-torques']))
 		self.observation_space = Box(stateMin, stateMax)
 
@@ -27,7 +27,12 @@ class Reach:
 
 	def reset(self):
 		self.sim.stop()
-		self.state = np.concatenate((np.zeros(3),) + self.sim.getRobotState())
+		self.state = self.observation_space.sample()
+		self.state[-len(self.settings['robot']['max-velocities']):] = 0
+		pose = self.state[len(self.settings['robot']['workspace-min']):-len(self.settings['robot']['max-velocities'])]
+		self.sim.setPose(pose)
+		vels = self.state[-len(self.settings['robot']['max-velocities']):]
+		self.sim.setVelocities(vels)
 		self.sim.start()
 		return self.state
 

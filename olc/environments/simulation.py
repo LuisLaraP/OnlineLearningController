@@ -29,11 +29,23 @@ class Simulation:
 		vrep.simxPauseCommunication(self.id, False)
 		return pos, vel
 
+	def setPose(self, pose):
+		vrep.simxPauseCommunication(self.id, True)
+		for j, p in zip(self.joints, pose):
+			vrep.simxSetJointPosition(self.id, j, p, vrep.simx_opmode_oneshot)
+		vrep.simxPauseCommunication(self.id, False)
+
 	def setTorques(self, torques):
 		vrep.simxPauseCommunication(self.id, True)
 		for j, t in zip(self.joints, torques):
 			vrep.simxSetJointTargetVelocity(self.id, j, np.sign(t) * 1e10, vrep.simx_opmode_oneshot)
 			vrep.simxSetJointForce(self.id, j, np.abs(t), vrep.simx_opmode_oneshot)
+		vrep.simxPauseCommunication(self.id, False)
+
+	def setVelocities(self, vels):
+		vrep.simxPauseCommunication(self.id, True)
+		for j, v in zip(self.joints, vels):
+			vrep.simxSetJointTargetVelocity(self.id, j, v, vrep.simx_opmode_oneshot)
 		vrep.simxPauseCommunication(self.id, False)
 
 	def start(self):
