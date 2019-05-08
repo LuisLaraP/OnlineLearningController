@@ -24,10 +24,11 @@ class Reach:
 		pass
 
 	def reset(self):
-		pass
+		self.state = np.zeros(self.observation_space.low.size)
+		return self.state
 
 	def render(self):
 		pass
 
 	def step(self, action):
-		pass
+		return self.state, 0, False, None
