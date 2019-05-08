@@ -38,15 +38,18 @@ class Reach:
 		self.sim.start()
 		self.sim.step()
 		self.state[len(self.settings['robot']['workspace-min']):] = np.concatenate(self.sim.getRobotState())
+		self.curStep = 0
 		return self.state
 
 	def render(self):
 		pass
 
 	def step(self, action):
+		self.curStep += 1
 		self.sim.setTorques(action)
 		self.sim.step()
 		self.state[len(self.settings['robot']['workspace-min']):] = np.concatenate(self.sim.getRobotState())
 		error = self.sim.readDistance(self.settings['error-object-name'])
 		reward = -error - np.linalg.norm(self.state[-self.action_space.low.size:]) * self.rewardVelFactor
-		return self.state, reward, False, None
+		reset = self.curStep >= self.settings['max-steps']
+		return self.state, reward, reset, None
