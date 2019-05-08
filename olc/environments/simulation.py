@@ -1,3 +1,4 @@
+import numpy as np
 import vrep
 
 
@@ -8,10 +9,25 @@ class Simulation:
 		if self.id == -1:
 			exit('Connection to V-REP failed.')
 		self.running = False
+		self.joints = []
+		for joint in robot['joints']:
+			self.joints.append(vrep.simxGetObjectHandle(self.id, joint, vrep.simx_opmode_blocking)[1])
+			vrep.simxGetJointPosition(self.id, self.joints[-1], vrep.simx_opmode_streaming)
+			vrep.simxGetObjectFloatParameter(self.id, self.joints[-1], vrep.sim_jointfloatparam_velocity, vrep.simx_opmode_streaming)
 
 	def close(self):
 		self.stop()
 		vrep.simxFinish(self.id)
+
+	def getRobotState(self):
+		pos = np.zeros(len(self.joints))
+		vel = np.zeros(len(self.joints))
+		vrep.simxPauseCommunication(self.id, True)
+		for i, joint in enumerate(self.joints):
+			pos[i] = vrep.simxGetJointPosition(self.id, joint, vrep.simx_opmode_buffer)[1]
+			vel[i] = vrep.simxGetObjectFloatParameter(self.id, joint, vrep.sim_jointfloatparam_velocity, vrep.simx_opmode_buffer)[1]
+		vrep.simxPauseCommunication(self.id, False)
+		return np.concatenate((pos, vel))
 
 	def start(self):
 		if not self.running:
