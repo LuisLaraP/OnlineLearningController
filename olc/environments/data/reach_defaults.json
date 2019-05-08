@@ -1,7 +1,6 @@
 {
 	"error-object-name": "Error",
 	"target-object-name": "Reference",
-	"threshold-failure": 2.0,
 	"threshold-success": 0.05,
 	"timestep": 0.05
 }
