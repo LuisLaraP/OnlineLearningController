@@ -17,9 +17,9 @@ class Reach:
 	def __init__(self, settings, simulation):
 		self.settings = settings
 		self.sim = simulation
-		stateMin = np.concatenate((settings['robot']['workspace-min'], settings['robot']['joint-min']))
-		stateMax = np.concatenate((settings['robot']['workspace-max'], settings['robot']['joint-max']))
-		self.action_space = Box(-np.array(settings['robot']['max-velocities']), np.array(settings['robot']['max-velocities']))
+		stateMin = np.concatenate((settings['robot']['workspace-min'], settings['robot']['joint-min'], -np.array(settings['robot']['max-velocities'])))
+		stateMax = np.concatenate((settings['robot']['workspace-max'], settings['robot']['joint-max'], np.array(settings['robot']['max-velocities'])))
+		self.action_space = Box(-np.array(settings['robot']['max-torques']), np.array(settings['robot']['max-torques']))
 		self.observation_space = Box(stateMin, stateMax)
 
 	def close(self):
