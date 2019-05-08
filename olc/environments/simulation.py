@@ -29,6 +29,13 @@ class Simulation:
 		vrep.simxPauseCommunication(self.id, False)
 		return np.concatenate((pos, vel))
 
+	def setTorques(self, torques):
+		vrep.simxPauseCommunication(self.id, True)
+		for j, t in zip(self.joints, torques):
+			vrep.simxSetJointTargetVelocity(self.id, j, np.sign(t) * 1e10, vrep.simx_opmode_oneshot)
+			vrep.simxSetJointForce(self.id, j, np.abs(t), vrep.simx_opmode_oneshot)
+		vrep.simxPauseCommunication(self.id, False)
+
 	def start(self):
 		if not self.running:
 			vrep.simxSynchronous(self.id, True)
