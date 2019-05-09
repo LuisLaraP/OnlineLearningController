@@ -13,7 +13,19 @@ make
 	Create a new instance of the given environment.
 """
 
+import gym.envs
+
 from .launcher import make, register
 from .reach import Reach
+
+# Mujoco ---------------------------------------------------------------------
+
+gym.envs.register(
+	'Reacher-v3',
+	entry_point='gym.envs.mujoco:ReacherEnv',
+	max_episode_steps=100
+)
+
+# Custom ---------------------------------------------------------------------
 
 register('Reach', Reach)

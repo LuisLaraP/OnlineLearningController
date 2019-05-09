@@ -1,6 +1,6 @@
 {
 	"task": {
-		"name": "Reacher-v2"
+		"name": "Reacher-v3"
 	},
 	"episodes": 100
 }
