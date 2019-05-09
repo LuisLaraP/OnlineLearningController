@@ -60,7 +60,8 @@ class Controller:
 			state = self.env.reset()
 			while not done:
 				step += 1
-				self.env.render()
+				if self.settings['render']:
+					self.env.render()
 				action = self._learnedPolicy(state) + self._randomPolicy(state)
 				newState, reward, done, _ = self.env.step(action)
 				self.buffer.storeTransition(state, action, reward, newState, done)
