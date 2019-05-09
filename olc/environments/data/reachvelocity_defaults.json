@@ -1,0 +1,6 @@
+{
+	"error-object-name": "Error",
+	"max-steps": 100,
+	"target-object-name": "Reference",
+	"threshold-success": 0.05
+}

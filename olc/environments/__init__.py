@@ -16,7 +16,8 @@ make
 import gym.envs
 
 from .launcher import make, register
-from .reach import Reach
+from .reach_torque import ReachTorque
+from .reach_velocity import ReachVelocity
 
 # Mujoco ---------------------------------------------------------------------
 
@@ -28,4 +29,5 @@ gym.envs.register(
 
 # Custom ---------------------------------------------------------------------
 
-register('Reach', Reach)
+register('ReachTorque', ReachTorque)
+register('ReachVelocity', ReachVelocity)
