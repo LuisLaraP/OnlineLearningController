@@ -1,4 +1,5 @@
 import sys
+import time
 
 import numpy as np
 import tensorflow as tf
@@ -58,6 +59,7 @@ class Controller:
 			episodeReward = 0
 			self.noise.reset()
 			state = self.env.reset()
+			startTime = time.time()
 			while not done:
 				step += 1
 				if self.settings['render']:
@@ -75,7 +77,8 @@ class Controller:
 				self.logger.logScalar('Action value', actionValue, step)
 				self.logger.logScalar('Reward', reward, step)
 			self.logger.logScalar('Learning curve', episodeReward, episode)
-			print('Episode {}:\tReward:{}'.format(episode, episodeReward))
+			elapsed = time.time() - startTime
+			print('Episode {}:\tReward: {}\tTime: {}'.format(episode, episodeReward, elapsed))
 			if episode % self.settings['save-interval'] == 0:
 				self.logger.checkpoint(self.session, step)
 
