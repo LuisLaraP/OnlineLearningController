@@ -2,5 +2,13 @@
 	"task": {
 		"name": "Reacher-v3"
 	},
-	"episodes": 100
+	"episodes": 5000,
+	"render": false,
+	"save-interval": 200,
+	"actor": {
+		"batch-normalization": true
+	},
+	"critic": {
+		"batch-normalization": true
+	}
 }
