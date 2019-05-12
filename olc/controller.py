@@ -30,6 +30,7 @@ class Controller:
 		self.critic.createTrainOps(self.action, self.qLabels)
 		self.actorTarget.createUpdateOps(self.settings['tau'], self.actor.parameters)
 		self.criticTarget.createUpdateOps(self.settings['tau'], self.critic.parameters)
+		self.incrementStep = tf.assign_add(tf.train.get_or_create_global_step(), 1)
 		self.logger.logGraph()
 
 	def run(self):
@@ -52,8 +53,7 @@ class Controller:
 			self.settings['noise']['sigma']
 		)
 		# Training
-		step = 0
-		self.logger.checkpoint(self.session, step)
+		self.logger.checkpoint(self.session, 0)
 		for episode in range(1, self.settings['episodes'] + 1):
 			done = False
 			episodeReward = 0
@@ -61,7 +61,7 @@ class Controller:
 			state = self.env.reset()
 			startTime = time.time()
 			while not done:
-				step += 1
+				step = self.session.run(self.incrementStep)
 				if self.settings['render']:
 					self.env.render()
 				action = self._learnedPolicy(state) + self._randomPolicy(state)
