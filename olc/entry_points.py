@@ -29,10 +29,14 @@ def olc_test():
 	# Create environment
 	environment = envs.make(settings['task'])
 
+	time = datetime.datetime.now().time()
+	experimentName = '{}-Test-{:%H:%M}'.format(settings['task']['name'], time)
+	logger = Logger(experimentName)
+
 	# Create controller
 	defParams = getDefaults(__name__, 'params')
 	mergedParams = merge(defParams, settings)
-	controller = Tester(mergedParams, environment, args.checkpoint_dir)
+	controller = Tester(mergedParams, environment, args.checkpoint_dir, logger)
 
 	# Run
 	controller.run()
