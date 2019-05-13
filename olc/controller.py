@@ -53,8 +53,10 @@ class Controller:
 			self.settings['noise']['sigma']
 		)
 		# Training
+		epoch = 0
 		self.logger.checkpoint(self.session, 0)
-		for episode in range(1, self.settings['episodes'] + 1):
+		while True:
+			epoch += 1
 			done = False
 			self.noise.reset()
 			state = self.env.reset()
@@ -75,6 +77,7 @@ class Controller:
 				self.logger.logScalar('Action value', actionValue, step)
 				self.logger.logScalar('Reward', reward, step)
 			elapsed = time.time() - startTime
+			print("Epoch {}:\tTime: {}".format(epoch, elapsed))
 			if step % self.settings['save-interval'] == 0:
 				self.logger.checkpoint(self.session, step)
 
