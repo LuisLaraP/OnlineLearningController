@@ -3,6 +3,5 @@
 		"name": "Reacher-v2"
 	},
 	"episodes": 50000,
-	"render": false,
-	"save-interval": 500
+	"render": false
 }

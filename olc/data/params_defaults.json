@@ -4,7 +4,7 @@
 	"gamma": 0.99,
 	"replay-buffer-size": 1000000,
 	"render": true,
-	"save-interval": 20,
+	"save-interval": 50000,
 	"tau": 0.001,
 	"actor": {
 		"batch-normalization": false,

@@ -3,6 +3,5 @@
 		"name": "InvertedDoublePendulum-v2"
 	},
 	"episodes": 10000,
-	"render": false,
-	"save-interval": 500
+	"render": false
 }

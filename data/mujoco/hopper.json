@@ -3,6 +3,5 @@
 		"name": "Hopper-v2"
 	},
 	"episodes": 15000,
-	"render": false,
-	"save-interval": 500
+	"render": false
 }

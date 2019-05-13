@@ -78,7 +78,7 @@ class Controller:
 				self.logger.logScalar('Reward', reward, step)
 			elapsed = time.time() - startTime
 			print('Episode {}:\tReward: {}\tTime: {}'.format(episode, episodeReward, elapsed))
-			if episode % self.settings['save-interval'] == 0:
+			if step % self.settings['save-interval'] == 0:
 				self.logger.checkpoint(self.session, step)
 
 	def _learnedPolicy(self, state):
