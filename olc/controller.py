@@ -84,7 +84,7 @@ class Controller:
 			if step % self.settings['save-interval'] == 0:
 				self.logger.checkpoint(self.session, step)
 			elapsed = time.time() - startTime
-			print("Epoch {}:\tTime: {}".format(epoch, elapsed))
+			print("Epoch {}:\tSteps: {}\tTime: {:.3}s".format(epoch, step, elapsed))
 			if step >= self.settings['steps']:
 				break
 
