@@ -1,7 +1,5 @@
 {
 	"task": {
 		"name": "Reacher-v2"
-	},
-	"episodes": 50000,
-	"render": false
+	}
 }

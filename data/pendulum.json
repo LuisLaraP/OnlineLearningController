@@ -1,6 +1,5 @@
 {
 	"task": {
 		"name": "Pendulum-v0"
-	},
-	"episodes": 100
+	}
 }

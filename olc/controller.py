@@ -54,32 +54,37 @@ class Controller:
 		)
 		# Training
 		epoch = 0
+		trainStep = 0
+		done = True
 		self.logger.checkpoint(self.session, 0)
 		while True:
-			epoch += 1
-			done = False
-			self.noise.reset()
-			state = self.env.reset()
 			startTime = time.time()
-			while not done:
+			epoch += 1
+			for _ in range(self.settings['nb-rollouts']):
+				if done:
+					state = self.env.reset()
+					self.noise.reset()
+					done = False
 				step = self.session.run(self.incrementStep)
-				if self.settings['render']:
-					self.env.render()
 				action = self._learnedPolicy(state) + self._randomPolicy(state)
 				newState, reward, done, _ = self.env.step(action)
 				self.buffer.storeTransition(state, action, reward, newState, done)
 				state = newState
-				self._train(step)
-				self.session.run([self.actorTarget.update, self.criticTarget.update])
 				actionValue = self.session.run(self.critic.output,
-					{self.action: [action], self.state: [state], self.isTraining: False})
+				{self.action: [action], self.state: [state], self.isTraining: False})
 				[self.logger.logScalar('Action/' + str(i), x, step) for i, x in enumerate(action)]
 				self.logger.logScalar('Action value', actionValue, step)
 				self.logger.logScalar('Reward', reward, step)
-			elapsed = time.time() - startTime
-			print("Epoch {}:\tTime: {}".format(epoch, elapsed))
+				if self.settings['render']:
+					self.env.render()
+			for _ in range(self.settings['nb-train']):
+				trainStep += 1
+				self._train(trainStep)
+				self.session.run([self.actorTarget.update, self.criticTarget.update])
 			if step % self.settings['save-interval'] == 0:
 				self.logger.checkpoint(self.session, step)
+			elapsed = time.time() - startTime
+			print("Epoch {}:\tTime: {}".format(epoch, elapsed))
 			if step >= self.settings['steps']:
 				break
 

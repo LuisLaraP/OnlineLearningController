@@ -1,7 +1,5 @@
 {
 	"task": {
 		"name": "Hopper-v2"
-	},
-	"episodes": 15000,
-	"render": false
+	}
 }

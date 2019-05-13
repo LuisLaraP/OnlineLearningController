@@ -1,7 +1,5 @@
 {
 	"task": {
 		"name": "InvertedDoublePendulum-v2"
-	},
-	"episodes": 10000,
-	"render": false
+	}
 }

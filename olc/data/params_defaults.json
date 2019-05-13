@@ -2,8 +2,10 @@
 	"steps": 1000000,
 	"batch-size": 64,
 	"gamma": 0.99,
+	"nb-rollouts": 100,
+	"nb-train": 50,
 	"replay-buffer-size": 1000000,
-	"render": true,
+	"render": false,
 	"save-interval": 50000,
 	"tau": 0.001,
 	"actor": {
