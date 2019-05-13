@@ -80,6 +80,8 @@ class Controller:
 			print("Epoch {}:\tTime: {}".format(epoch, elapsed))
 			if step % self.settings['save-interval'] == 0:
 				self.logger.checkpoint(self.session, step)
+			if step >= self.settings['steps']:
+				break
 
 	def _learnedPolicy(self, state):
 		action = self.session.run(self.actor.output, {

@@ -1,5 +1,5 @@
 {
-	"episodes": 50000,
+	"steps": 1000000,
 	"batch-size": 64,
 	"gamma": 0.99,
 	"replay-buffer-size": 1000000,
