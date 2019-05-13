@@ -1,5 +1,7 @@
 {
 	"task": {
 		"name": "Pendulum-v0"
-	}
+	},
+	"steps": 60000,
+	"save-interval": 10000
 }
