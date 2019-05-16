@@ -1,6 +1,6 @@
 {
 	"task": {
-		"name": "Reacher-v2"
+		"name": "RoboschoolReacher-v1"
 	},
 	"steps": 500000,
 	"save-interval": 10000

@@ -1,3 +1,4 @@
+import roboschool
 from olc.environments.simulation import Simulation
 from olc.settings import getDefaults, merge
 
