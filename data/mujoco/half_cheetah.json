@@ -1,0 +1,7 @@
+{
+	"task": {
+		"name": "HalfCheetah-v2"
+	},
+	"steps": 300000,
+	"save-interval": 10000
+}
