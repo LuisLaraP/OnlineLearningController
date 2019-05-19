@@ -77,7 +77,6 @@ class Controller:
 				self.logger.logScalar('Reward', reward, step)
 				if self.settings['render']:
 					self.env.render()
-			startTime = time.time()
 			for _ in range(self.settings['nb-train']):
 				trainStep += 1
 				self._train(trainStep)
