@@ -15,12 +15,15 @@ class ReplayBuffer:
 		Maximum number of elements to be stored.
 	"""
 
-	def __init__(self, size):
-		self.iState = collections.deque(maxlen=size)
-		self.action = collections.deque(maxlen=size)
-		self.reward = collections.deque(maxlen=size)
-		self.fState = collections.deque(maxlen=size)
-		self.terminal = collections.deque(maxlen=size)
+	def __init__(self, size, actionDim, stateDim):
+		self.size = size
+		self.nElem = 0
+		self.nextIdx = 0
+		self.iState = np.zeros((size, stateDim))
+		self.action = np.zeros((size, actionDim))
+		self.reward = np.zeros(size)
+		self.fState = np.zeros((size, stateDim))
+		self.terminal = np.zeros(size, bool)
 
 	def storeTransition(self, si, a, r, sf, t):
 		"""Add the given transition to the buffer.
@@ -40,11 +43,14 @@ class ReplayBuffer:
 		t : bool
 			True if the given transition was the last in its episode.
 		"""
-		self.iState.append(si)
-		self.action.append(a)
-		self.reward.append(r)
-		self.fState.append(sf)
-		self.terminal.append(t)
+		if self.nElem < self.size:
+			self.nElem += 1
+		self.iState[self.nextIdx, :] = si
+		self.action[self.nextIdx, :] = a
+		self.reward[self.nextIdx] = r
+		self.fState[self.nextIdx, :] = sf
+		self.terminal[self.nextIdx] = t
+		self.nextIdx = (self.nextIdx + 1) % self.size
 
 	def sample(self, n):
 		"""Return a random set of transitions from the buffer.
@@ -70,12 +76,7 @@ class ReplayBuffer:
 		terminal : List of bool
 			True if the given transition was the last in its episode.
 		"""
-		if n > len(self.action):
+		if n > self.nElem:
 			return [], [], [], [], []
-		idx = random.sample(range(len(self.action)), n)
-		iStateList = [self.iState[x] for x in idx]
-		actionList = [self.action[x] for x in idx]
-		rewardList = [self.reward[x] for x in idx]
-		fStateList = [self.fState[x] for x in idx]
-		terminalList = [self.terminal[x] for x in idx]
-		return np.array(iStateList), np.array(actionList), np.array(rewardList), np.array(fStateList), np.array(terminalList, dtype=bool)
+		idx = random.sample(range(self.nElem), n)
+		return self.iState[idx, :], self.action[idx, :], self.reward[idx], self.fState[idx, :], self.terminal[idx]

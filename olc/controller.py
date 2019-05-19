@@ -45,7 +45,7 @@ class Controller:
 		for f, t in zip(criticParams, self.criticTarget.parameters):
 			t.load(f, self.session)
 		# Create replay buffer
-		self.buffer = ReplayBuffer(self.settings['replay-buffer-size'])
+		self.buffer = ReplayBuffer(self.settings['replay-buffer-size'], self.actionDim, self.stateDim)
 		# Create noise process
 		self.noise = OrnsteinUhlenbeck(self.actionDim,
 			self.settings['noise']['dt'],
@@ -71,12 +71,13 @@ class Controller:
 				self.buffer.storeTransition(state, action, reward, newState, done)
 				state = newState
 				actionValue = self.session.run(self.critic.output,
-				{self.action: [action], self.state: [state], self.isTraining: False})
+					{self.action: [action], self.state: [state], self.isTraining: False})
 				[self.logger.logScalar('Action/' + str(i), x, step) for i, x in enumerate(action)]
 				self.logger.logScalar('Action value', actionValue, step)
 				self.logger.logScalar('Reward', reward, step)
 				if self.settings['render']:
 					self.env.render()
+			startTime = time.time()
 			for _ in range(self.settings['nb-train']):
 				trainStep += 1
 				self._train(trainStep)
@@ -110,7 +111,7 @@ class Controller:
 				self.action: actions,
 				self.state: sfBatch
 			})
-			labels = np.reshape(rBatch, (rBatch.size, 1)) + self.settings['gamma'] * qValues
+			labels = self.settings['gamma'] * qValues + np.reshape(rBatch, (rBatch.size, 1))
 			labels[tBatch] = 0
 			_, loss = self.session.run([self.critic.train, self.critic.loss], {
 				self.action: aBatch,
