@@ -34,6 +34,11 @@ gym.envs.register(
 	entry_point='olc.environments.reacher2:Reacher2',
 	max_episode_steps=100
 )
+gym.envs.register(
+	'Reacher3-v0',
+	entry_point='olc.environments.reacher3:Reacher3',
+	max_episode_steps=100
+)
 
 # Custom ---------------------------------------------------------------------
 
