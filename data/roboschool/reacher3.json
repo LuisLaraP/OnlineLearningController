@@ -3,6 +3,5 @@
 		"name": "Reacher3-v0"
 	},
 	"steps": 500000,
-	"save-interval": 10000,
-	"render": true
+	"save-interval": 10000
 }

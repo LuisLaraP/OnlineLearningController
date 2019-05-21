@@ -71,8 +71,8 @@ class Reacher3(RoboschoolMujocoXmlEnv):
             -0.10*(np.abs(a[0]*self.theta_dot) + np.abs(a[1]*self.gamma_dot) + np.abs(a[2]*self.alpha_dot))  # work torque*angular_velocity
             -0.01*(np.abs(a[0]) + np.abs(a[1]) + np.abs(a[2])) # stall torque require some energy
             )
-        stuck_joint_cost = -0.1 if np.abs(np.abs(self.gamma)-1) < 0.01 else 0.0
-        stuck_joint_cost += -0.1 if np.abs(np.abs(self.alpha)-1) < 0.01 else 0.0
+        stuck_joint_cost = -1 if np.abs(np.abs(self.gamma)-1) < 0.05 else 0.0
+        stuck_joint_cost += -1 if np.abs(np.abs(self.alpha)-1) < 0.05 else 0.0
         self.rewards = [float(self.potential - potential_old), float(electricity_cost), float(stuck_joint_cost)]
         self.frame  += 1
         self.done   += 0
