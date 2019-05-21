@@ -27,6 +27,14 @@ gym.envs.register(
 	max_episode_steps=100
 )
 
+# Roboschool -----------------------------------------------------------------
+
+gym.envs.register(
+	'Reacher2-v0',
+	entry_point='olc.environments.reacher2:Reacher2',
+	max_episode_steps=100
+)
+
 # Custom ---------------------------------------------------------------------
 
 register('ReachTorque', ReachTorque)
