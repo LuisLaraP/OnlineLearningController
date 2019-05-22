@@ -1,0 +1,9 @@
+{
+	"task": {
+		"name": "Reacher2-v0"
+	},
+	"controller-type": "continuous",
+	"steps": 500000,
+	"save-interval": 10000,
+	"render": true
+}

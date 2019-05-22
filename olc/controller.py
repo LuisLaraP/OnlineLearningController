@@ -77,6 +77,55 @@ class Controller:
 		self.logger.logScalar('Critic loss', loss, step)
 
 
+class ContinuousController(Controller):
+
+	def run(self):
+		self.session = tf.Session()
+		self.session.run(tf.global_variables_initializer())
+		# Initialize actor target parameters
+		actorParams = self.session.run(self.actor.parameters)
+		for f, t in zip(actorParams, self.actorTarget.parameters):
+			t.load(f, self.session)
+		# Initialize critic target parameters
+		criticParams = self.session.run(self.critic.parameters)
+		for f, t in zip(criticParams, self.criticTarget.parameters):
+			t.load(f, self.session)
+		# Create replay buffer
+		self.buffer = ReplayBuffer(self.settings['replay-buffer-size'], self.actionDim, self.stateDim)
+		# Create noise process
+		self.noise = OrnsteinUhlenbeck(self.actionDim,
+			self.settings['noise']['dt'],
+			self.settings['noise']['theta'],
+			self.settings['noise']['sigma']
+		)
+		# Training
+		state = self.env.reset()
+		self.noise.reset()
+		step = 0
+		trainStep = 0
+		self.logger.checkpoint(self.session, 0)
+		while step < self.settings['steps']:
+			for _ in range(self.settings['nb-rollouts']):
+				step = self.session.run(self.incrementStep)
+				action = self._learnedPolicy(state) + self._randomPolicy(state)
+				newState, reward, done, _ = self.env.step(action)
+				self.buffer.storeTransition(state, action, reward, newState, done)
+				state = newState
+				actionValue = self.session.run(self.critic.output,
+					{self.action: [action], self.state: [state], self.isTraining: False})
+				[self.logger.logScalar('Action/' + str(i), x, step) for i, x in enumerate(action)]
+				self.logger.logScalar('Action value', actionValue, step)
+				self.logger.logScalar('Reward', reward, step)
+				if self.settings['render']:
+					self.env.render()
+			for _ in range(self.settings['nb-train']):
+				trainStep += 1
+				self._train(trainStep)
+				self.session.run([self.actorTarget.update, self.criticTarget.update])
+			if step % self.settings['save-interval'] == 0:
+				self.logger.checkpoint(self.session, step)
+
+
 class EpisodicController(Controller):
 
 	def run(self):
