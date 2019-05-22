@@ -108,8 +108,8 @@ class ContinuousController(Controller):
 			for _ in range(self.settings['nb-rollouts']):
 				step = self.session.run(self.incrementStep)
 				action = self._learnedPolicy(state) + self._randomPolicy(state)
-				newState, reward, done, _ = self.env.step(action)
-				self.buffer.storeTransition(state, action, reward, newState, done)
+				newState, reward, _, _ = self.env.step(action)
+				self.buffer.storeTransition(state, action, reward, newState, False)
 				state = newState
 				actionValue = self.session.run(self.critic.output,
 					{self.action: [action], self.state: [state], self.isTraining: False})
