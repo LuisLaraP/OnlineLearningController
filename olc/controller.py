@@ -33,6 +33,52 @@ class Controller:
 		self.incrementStep = tf.assign_add(tf.train.get_or_create_global_step(), 1)
 		self.logger.logGraph()
 
+	def _learnedPolicy(self, state):
+		action = self.session.run(self.actor.output, {
+			self.state: [state],
+			self.isTraining: False
+		})
+		return action[0]
+
+	def _randomPolicy(self, _):
+		return self.noise.step() * (self.env.action_space.high - self.env.action_space.low)
+
+	def _train(self, step):
+		siBatch, aBatch, rBatch, sfBatch, tBatch = self.buffer.sample(self.settings['batch-size'])
+		loss = 0
+		if len(siBatch) > 0:
+			# Critic
+			actions = self.session.run(self.actorTarget.output, {
+				self.state: sfBatch
+			})
+			qValues = self.session.run(self.criticTarget.output, {
+				self.action: actions,
+				self.state: sfBatch
+			})
+			labels = self.settings['gamma'] * qValues + np.reshape(rBatch, (rBatch.size, 1))
+			labels[tBatch] = 0
+			_, loss = self.session.run([self.critic.train, self.critic.loss], {
+				self.action: aBatch,
+				self.state: siBatch,
+				self.qLabels: labels
+			})
+			# Actor
+			actions = self.session.run(self.actor.output, {
+				self.state: siBatch
+			})
+			actionGrads = self.session.run(self.critic.actionGrads, {
+				self.action: actions,
+				self.state: siBatch,
+			})[0]
+			self.session.run(self.actor.train, {
+				self.state: siBatch,
+				self.actionGrads: actionGrads
+			})
+		self.logger.logScalar('Critic loss', loss, step)
+
+
+class EpisodicController(Controller):
+
 	def run(self):
 		self.session = tf.Session()
 		self.session.run(tf.global_variables_initializer())
@@ -87,49 +133,6 @@ class Controller:
 			print("Epoch {}:\tSteps: {}\tTime: {:.3}s".format(epoch, step, elapsed))
 			if step >= self.settings['steps']:
 				break
-
-	def _learnedPolicy(self, state):
-		action = self.session.run(self.actor.output, {
-			self.state: [state],
-			self.isTraining: False
-		})
-		return action[0]
-
-	def _randomPolicy(self, _):
-		return self.noise.step() * (self.env.action_space.high - self.env.action_space.low)
-
-	def _train(self, step):
-		siBatch, aBatch, rBatch, sfBatch, tBatch = self.buffer.sample(self.settings['batch-size'])
-		loss = 0
-		if len(siBatch) > 0:
-			# Critic
-			actions = self.session.run(self.actorTarget.output, {
-				self.state: sfBatch
-			})
-			qValues = self.session.run(self.criticTarget.output, {
-				self.action: actions,
-				self.state: sfBatch
-			})
-			labels = self.settings['gamma'] * qValues + np.reshape(rBatch, (rBatch.size, 1))
-			labels[tBatch] = 0
-			_, loss = self.session.run([self.critic.train, self.critic.loss], {
-				self.action: aBatch,
-				self.state: siBatch,
-				self.qLabels: labels
-			})
-			# Actor
-			actions = self.session.run(self.actor.output, {
-				self.state: siBatch
-			})
-			actionGrads = self.session.run(self.critic.actionGrads, {
-				self.action: actions,
-				self.state: siBatch,
-			})[0]
-			self.session.run(self.actor.train, {
-				self.state: siBatch,
-				self.actionGrads: actionGrads
-			})
-		self.logger.logScalar('Critic loss', loss, step)
 
 
 class Tester:

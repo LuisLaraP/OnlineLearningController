@@ -3,7 +3,7 @@ import datetime
 import json
 
 import olc.environments as envs
-from olc.controller import Controller, Tester
+from olc.controller import EpisodicController, Tester
 from olc.logger import Logger
 from olc.settings import getDefaults, merge
 
@@ -68,7 +68,7 @@ def olc_train():
 	# Create controller
 	defParams = getDefaults(__name__, 'params')
 	mergedParams = merge(defParams, settings)
-	controller = Controller(mergedParams, environment, logger)
+	controller = EpisodicController(mergedParams, environment, logger)
 
 	# Run
 	controller.run()
