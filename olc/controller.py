@@ -11,7 +11,7 @@ from olc.replay_buffer import ReplayBuffer
 
 class Controller:
 
-	def __init__(self, settings, environment, logger):
+	def __init__(self, settings, environment, logger, checkpoint):
 		self.settings = settings
 		self.env = environment
 		self.logger = logger
@@ -32,6 +32,10 @@ class Controller:
 		self.criticTarget.createUpdateOps(self.settings['tau'], self.critic.parameters)
 		self.incrementStep = tf.assign_add(tf.train.get_or_create_global_step(), 1)
 		self.logger.logGraph()
+		if checkpoint is not None:
+			self.checkpoint = tf.train.latest_checkpoint(checkpoint)
+		else:
+			self.checkpoint = None
 
 	def _learnedPolicy(self, state):
 		action = self.session.run(self.actor.output, {
@@ -98,6 +102,9 @@ class ContinuousController(Controller):
 			self.settings['noise']['theta'],
 			self.settings['noise']['sigma']
 		)
+		# Load checkpoint if provided
+		if self.checkpoint is not None:
+			self.logger.loadCheckpoint(self.session, self.checkpoint)
 		# Training
 		state = self.env.reset()
 		self.noise.reset()
@@ -147,6 +154,9 @@ class EpisodicController(Controller):
 			self.settings['noise']['theta'],
 			self.settings['noise']['sigma']
 		)
+		# Load checkpoint if provided
+		if self.checkpoint is not None:
+			self.logger.loadCheckpoint(self.session, self.checkpoint)
 		# Training
 		epoch = 0
 		trainStep = 0

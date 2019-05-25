@@ -51,6 +51,12 @@ def olc_train():
 		'settings',
 		help='path to the settings file.'
 	)
+	parser.add_argument(
+		'-c', '--checkpoint',
+		default=None,
+		required=False,
+		help='path to a checkpoint file to load before training.'
+	)
 	args = parser.parse_args()
 
 	# Read settings
@@ -69,9 +75,9 @@ def olc_train():
 	defParams = getDefaults(__name__, 'params')
 	mergedParams = merge(defParams, settings)
 	if mergedParams['controller-type'] == 'episodic':
-		controller = EpisodicController(mergedParams, environment, logger)
+		controller = EpisodicController(mergedParams, environment, logger, args.checkpoint)
 	elif mergedParams['controller-type'] == 'continuous':
-		controller = ContinuousController(mergedParams, environment, logger)
+		controller = ContinuousController(mergedParams, environment, logger, args.checkpoint)
 	else:
 		exit('Controller type not recognized.')
 
