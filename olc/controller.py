@@ -56,15 +56,12 @@ class Controller:
 			})
 			labels = self.settings['gamma'] * qValues + np.reshape(rBatch, (rBatch.size, 1))
 			labels[tBatch] = 0
-			_, loss = self.session.run([self.critic.train, self.critic.loss], {
+			_, loss, actions = self.session.run([self.critic.train, self.critic.loss, self.actor.output], {
 				self.action: aBatch,
 				self.state: siBatch,
 				self.qLabels: labels
 			})
 			# Actor
-			actions = self.session.run(self.actor.output, {
-				self.state: siBatch
-			})
 			self.session.run(self.actor.train, {
 				self.action: actions,
 				self.state: siBatch
