@@ -158,12 +158,11 @@ class EpisodicController(Controller):
 					state = self.env.reset()
 					self.noise.reset()
 					done = False
-				step = self.session.run(self.incrementStep)
 				action = self._learnedPolicy(state) + self._randomPolicy(state)
 				newState, reward, done, _ = self.env.step(action)
 				self.buffer.storeTransition(state, action, reward, newState, done)
 				state = newState
-				actionValue = self.session.run(self.critic.output,
+				step, actionValue = self.session.run([self.incrementStep, self.critic.output],
 					{self.action: [action], self.state: [state], self.isTraining: False})
 				[self.logger.logScalar('Action/' + str(i), x, step) for i, x in enumerate(action)]
 				self.logger.logScalar('Action value', actionValue, step)
