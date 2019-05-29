@@ -25,7 +25,7 @@ class Controller:
 		self.actor = Actor('actor', self.settings['actor'], self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
 		self.critic = Critic('critic', self.settings['critic'], self.action, self.state, self.isTraining)
 		self.actorTarget = Actor('actor_target', self.settings['actor'], self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
-		self.criticTarget = Critic('critic_target', self.settings['critic'], self.action, self.state, self.isTraining)
+		self.criticTarget = Critic('critic_target', self.settings['critic'], self.actorTarget.output, self.state, self.isTraining)
 		self.actor.createTrainOps(self.actionGrads, self.settings['batch-size'])
 		self.critic.createTrainOps(self.action, self.qLabels)
 		self.actorTarget.createUpdateOps(self.settings['tau'], self.actor.parameters)
@@ -52,11 +52,7 @@ class Controller:
 		loss = 0
 		if len(siBatch) > 0:
 			# Critic
-			actions = self.session.run(self.actorTarget.output, {
-				self.state: sfBatch
-			})
 			qValues = self.session.run(self.criticTarget.output, {
-				self.action: actions,
 				self.state: sfBatch
 			})
 			labels = self.settings['gamma'] * qValues + np.reshape(rBatch, (rBatch.size, 1))
