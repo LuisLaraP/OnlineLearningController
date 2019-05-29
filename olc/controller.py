@@ -20,14 +20,13 @@ class Controller:
 		self.action = tf.placeholder(tf.float32, (None, self.actionDim), name='action')
 		self.state = tf.placeholder(tf.float32, (None, self.stateDim), name='state')
 		self.qLabels = tf.placeholder(tf.float32, (None, 1), name='q_labels')
-		self.actionGrads = tf.placeholder(tf.float32, (None, self.actionDim), name='action_gradients')
 		self.isTraining = tf.placeholder_with_default(True, None, 'is_training')
 		self.actor = Actor('actor', self.settings['actor'], self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
 		self.critic = Critic('critic', self.settings['critic'], self.action, self.state, self.isTraining)
 		self.actorTarget = Actor('actor_target', self.settings['actor'], self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
 		self.criticTarget = Critic('critic_target', self.settings['critic'], self.actorTarget.output, self.state, self.isTraining)
-		self.actor.createTrainOps(self.actionGrads, self.settings['batch-size'])
 		self.critic.createTrainOps(self.action, self.qLabels)
+		self.actor.createTrainOps(self.critic.actionGrads, self.settings['batch-size'])
 		self.actorTarget.createUpdateOps(self.settings['tau'], self.actor.parameters)
 		self.criticTarget.createUpdateOps(self.settings['tau'], self.critic.parameters)
 		self.incrementStep = tf.assign_add(tf.train.get_or_create_global_step(), 1)
@@ -66,13 +65,9 @@ class Controller:
 			actions = self.session.run(self.actor.output, {
 				self.state: siBatch
 			})
-			actionGrads = self.session.run(self.critic.actionGrads, {
-				self.action: actions,
-				self.state: siBatch,
-			})[0]
 			self.session.run(self.actor.train, {
-				self.state: siBatch,
-				self.actionGrads: actionGrads
+				self.action: actions,
+				self.state: siBatch
 			})
 		self.logger.logScalar('Critic loss', loss, step)
 

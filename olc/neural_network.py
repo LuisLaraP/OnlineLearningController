@@ -50,7 +50,7 @@ class Actor:
 
 	def createTrainOps(self, actionGrad, batchSize):
 		with tf.variable_scope('train_actor'):
-			self.gradient = tf.gradients(self.output, self.parameters, -actionGrad)
+			self.gradient = tf.gradients(self.output, self.parameters, -actionGrad[0])
 			self.gradient = [x / batchSize for x in self.gradient]
 			optimizer = tf.train.AdamOptimizer(self.settings['learning-rate'])
 			self.train = optimizer.apply_gradients(zip(self.gradient, self.parameters))
