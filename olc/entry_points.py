@@ -3,7 +3,7 @@ import datetime
 import json
 
 import olc.environments as envs
-from olc.controller import ContinuousController, EpisodicController, Tester
+from olc.controller import Controller, Tester
 from olc.logger import Logger
 from olc.settings import getDefaults, merge
 
@@ -74,12 +74,7 @@ def olc_train():
 	# Create controller
 	defParams = getDefaults(__name__, 'params')
 	mergedParams = merge(defParams, settings)
-	if mergedParams['controller-type'] == 'episodic':
-		controller = EpisodicController(mergedParams, environment, logger, args.checkpoint)
-	elif mergedParams['controller-type'] == 'continuous':
-		controller = ContinuousController(mergedParams, environment, logger, args.checkpoint)
-	else:
-		exit('Controller type not recognized.')
+	controller = Controller(mergedParams, environment, logger, args.checkpoint)
 
 	# Run
 	controller.run()

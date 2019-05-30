@@ -17,111 +17,12 @@ class Controller:
 		self.logger = logger
 		self.actionDim = self.env.action_space.low.size
 		self.stateDim = self.env.observation_space.low.size
-		self.action = tf.placeholder(tf.float32, (None, self.actionDim), name='action')
-		self.state = tf.placeholder(tf.float32, (None, self.stateDim), name='state')
-		self.qLabels = tf.placeholder(tf.float32, (None, 1), name='q_labels')
-		self.isTraining = tf.placeholder_with_default(True, None, 'is_training')
-		self.actor = Actor('actor', self.settings['actor'], self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
-		self.critic = Critic('critic', self.settings['critic'], self.action, self.state, self.isTraining)
-		self.actorTarget = Actor('actor_target', self.settings['actor'], self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
-		self.criticTarget = Critic('critic_target', self.settings['critic'], self.actorTarget.output, self.state, self.isTraining)
-		self.critic.createTrainOps(self.action, self.qLabels)
-		self.actor.createTrainOps(self.critic.actionGrads, self.settings['batch-size'])
-		self.actorTarget.createUpdateOps(self.settings['tau'], self.actor.parameters)
-		self.criticTarget.createUpdateOps(self.settings['tau'], self.critic.parameters)
-		self.incrementStep = tf.assign_add(tf.train.get_or_create_global_step(), 1)
+		self._setupModel()
 		self.logger.logGraph()
 		if checkpoint is not None:
 			self.checkpoint = tf.train.latest_checkpoint(checkpoint)
 		else:
 			self.checkpoint = None
-
-	def _learnedPolicy(self, state):
-		action = self.session.run(self.actor.output, {
-			self.state: [state],
-			self.isTraining: False
-		})
-		return action[0]
-
-	def _randomPolicy(self, _):
-		return self.noise.step() * (self.env.action_space.high - self.env.action_space.low)
-
-	def _train(self, step):
-		siBatch, aBatch, rBatch, sfBatch, tBatch = self.buffer.sample(self.settings['batch-size'])
-		loss = 0
-		if len(siBatch) > 0:
-			# Critic
-			qValues = self.session.run(self.criticTarget.output, {
-				self.state: sfBatch
-			})
-			labels = self.settings['gamma'] * qValues + np.reshape(rBatch, (rBatch.size, 1))
-			labels[tBatch] = 0
-			_, loss, actions = self.session.run([self.critic.train, self.critic.loss, self.actor.output], {
-				self.action: aBatch,
-				self.state: siBatch,
-				self.qLabels: labels
-			})
-			# Actor
-			self.session.run(self.actor.train, {
-				self.action: actions,
-				self.state: siBatch
-			})
-		self.logger.logScalar('Critic loss', loss, step)
-
-
-class ContinuousController(Controller):
-
-	def run(self):
-		self.session = tf.Session()
-		self.session.run(tf.global_variables_initializer())
-		# Initialize actor target parameters
-		actorParams = self.session.run(self.actor.parameters)
-		for f, t in zip(actorParams, self.actorTarget.parameters):
-			t.load(f, self.session)
-		# Initialize critic target parameters
-		criticParams = self.session.run(self.critic.parameters)
-		for f, t in zip(criticParams, self.criticTarget.parameters):
-			t.load(f, self.session)
-		# Create replay buffer
-		self.buffer = ReplayBuffer(self.settings['replay-buffer-size'], self.actionDim, self.stateDim)
-		# Create noise process
-		self.noise = OrnsteinUhlenbeck(self.actionDim,
-			self.settings['noise']['dt'],
-			self.settings['noise']['theta'],
-			self.settings['noise']['sigma']
-		)
-		# Load checkpoint if provided
-		if self.checkpoint is not None:
-			self.logger.loadCheckpoint(self.session, self.checkpoint)
-		# Training
-		state = self.env.reset()
-		self.noise.reset()
-		step = 0
-		trainStep = 0
-		self.logger.checkpoint(self.session, 0)
-		while step < self.settings['steps']:
-			for _ in range(self.settings['nb-rollouts']):
-				step = self.session.run(self.incrementStep)
-				action = self._learnedPolicy(state) + self._randomPolicy(state)
-				newState, reward, _, _ = self.env.step(action)
-				self.buffer.storeTransition(state, action, reward, newState, False)
-				state = newState
-				actionValue = self.session.run(self.critic.output,
-					{self.action: [action], self.state: [state], self.isTraining: False})
-				[self.logger.logScalar('Action/' + str(i), x, step) for i, x in enumerate(action)]
-				self.logger.logScalar('Action value', actionValue, step)
-				self.logger.logScalar('Reward', reward, step)
-				if self.settings['render']:
-					self.env.render()
-			for _ in range(self.settings['nb-train']):
-				trainStep += 1
-				self._train(trainStep)
-				self.session.run([self.actorTarget.update, self.criticTarget.update])
-			if step % self.settings['save-interval'] == 0:
-				self.logger.checkpoint(self.session, step)
-
-
-class EpisodicController(Controller):
 
 	def run(self):
 		self.session = tf.Session()
@@ -147,10 +48,11 @@ class EpisodicController(Controller):
 			self.logger.loadCheckpoint(self.session, self.checkpoint)
 		# Training
 		epoch = 0
+		step = 0
 		trainStep = 0
 		done = True
 		self.logger.checkpoint(self.session, 0)
-		while True:
+		while step < self.settings['steps']:
 			startTime = time.time()
 			epoch += 1
 			for _ in range(self.settings['nb-rollouts']):
@@ -160,6 +62,8 @@ class EpisodicController(Controller):
 					done = False
 				action = self._learnedPolicy(state) + self._randomPolicy(state)
 				newState, reward, done, _ = self.env.step(action)
+				if self.settings['controller-type'] == 'continuous':
+					done = False
 				self.buffer.storeTransition(state, action, reward, newState, done)
 				state = newState
 				step, actionValue = self.session.run([self.incrementStep, self.critic.output],
@@ -177,8 +81,53 @@ class EpisodicController(Controller):
 				self.logger.checkpoint(self.session, step)
 			elapsed = time.time() - startTime
 			print("Epoch {}:\tSteps: {}\tTime: {:.3}s".format(epoch, step, elapsed))
-			if step >= self.settings['steps']:
-				break
+
+	def _learnedPolicy(self, state):
+		action = self.session.run(self.actor.output, {
+			self.state: [state],
+			self.isTraining: False
+		})
+		return action[0]
+
+	def _randomPolicy(self, _):
+		return self.noise.step() * (self.env.action_space.high - self.env.action_space.low)
+
+	def _setupModel(self):
+		self.action = tf.placeholder(tf.float32, (None, self.actionDim), name='action')
+		self.state = tf.placeholder(tf.float32, (None, self.stateDim), name='state')
+		self.qLabels = tf.placeholder(tf.float32, (None, 1), name='q_labels')
+		self.isTraining = tf.placeholder_with_default(True, None, 'is_training')
+		self.actor = Actor('actor', self.settings['actor'], self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
+		self.critic = Critic('critic', self.settings['critic'], self.action, self.state, self.isTraining)
+		self.actorTarget = Actor('actor_target', self.settings['actor'], self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
+		self.criticTarget = Critic('critic_target', self.settings['critic'], self.actorTarget.output, self.state, self.isTraining)
+		self.critic.createTrainOps(self.action, self.qLabels)
+		self.actor.createTrainOps(self.critic.actionGrads, self.settings['batch-size'])
+		self.actorTarget.createUpdateOps(self.settings['tau'], self.actor.parameters)
+		self.criticTarget.createUpdateOps(self.settings['tau'], self.critic.parameters)
+		self.incrementStep = tf.assign_add(tf.train.get_or_create_global_step(), 1)
+
+	def _train(self, step):
+		siBatch, aBatch, rBatch, sfBatch, tBatch = self.buffer.sample(self.settings['batch-size'])
+		loss = 0
+		if len(siBatch) > 0:
+			# Critic
+			qValues = self.session.run(self.criticTarget.output, {
+				self.state: sfBatch
+			})
+			labels = self.settings['gamma'] * qValues + np.reshape(rBatch, (rBatch.size, 1))
+			labels[tBatch] = 0
+			_, loss, actions = self.session.run([self.critic.train, self.critic.loss, self.actor.output], {
+				self.action: aBatch,
+				self.state: siBatch,
+				self.qLabels: labels
+			})
+			# Actor
+			self.session.run(self.actor.train, {
+				self.action: actions,
+				self.state: siBatch
+			})
+		self.logger.logScalar('Critic loss', loss, step)
 
 
 class Tester:
