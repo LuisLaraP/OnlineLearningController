@@ -72,11 +72,11 @@ class Controller:
 				self.logger.logScalar('Reward', reward, step)
 				if self.settings['render']:
 					self.env.render()
-				loss = 0
+			loss = 0
 			for _ in range(self.settings['nb-train']):
 				loss += self._train()
-				loss /= self.settings['nb-train']
 				self.session.run([self.actorTarget.update, self.criticTarget.update])
+			loss /= self.settings['nb-train']
 			self.logger.logScalar('Critic loss', loss, step)
 			if step % self.settings['save-interval'] == 0:
 				self.logger.checkpoint(self.session, step)
