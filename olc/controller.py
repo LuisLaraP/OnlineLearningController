@@ -49,7 +49,6 @@ class Controller:
 		# Training
 		epoch = 0
 		step = 0
-		trainStep = 0
 		done = True
 		self.logger.checkpoint(self.session, 0)
 		while step < self.settings['steps']:
@@ -73,10 +72,12 @@ class Controller:
 				self.logger.logScalar('Reward', reward, step)
 				if self.settings['render']:
 					self.env.render()
+				loss = 0
 			for _ in range(self.settings['nb-train']):
-				trainStep += 1
-				self._train(trainStep)
+				loss += self._train()
+				loss /= self.settings['nb-train']
 				self.session.run([self.actorTarget.update, self.criticTarget.update])
+			self.logger.logScalar('Critic loss', loss, step)
 			if step % self.settings['save-interval'] == 0:
 				self.logger.checkpoint(self.session, step)
 			elapsed = time.time() - startTime
@@ -107,7 +108,7 @@ class Controller:
 		self.criticTarget.createUpdateOps(self.settings['tau'], self.critic.parameters)
 		self.incrementStep = tf.assign_add(tf.train.get_or_create_global_step(), 1)
 
-	def _train(self, step):
+	def _train(self):
 		siBatch, aBatch, rBatch, sfBatch, tBatch = self.buffer.sample(self.settings['batch-size'])
 		loss = 0
 		if len(siBatch) > 0:
@@ -127,7 +128,7 @@ class Controller:
 				self.action: actions,
 				self.state: siBatch
 			})
-		self.logger.logScalar('Critic loss', loss, step)
+		return loss
 
 
 class Tester:
