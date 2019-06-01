@@ -18,6 +18,7 @@ class Controller:
 		self.actionDim = self.env.action_space.low.size
 		self.stateDim = self.env.observation_space.low.size
 		self._setupModel()
+		self._setupMetrics()
 		self.logger.logGraph()
 		if checkpoint is not None:
 			self.checkpoint = tf.train.latest_checkpoint(checkpoint)
@@ -67,9 +68,10 @@ class Controller:
 				state = newState
 				step, actionValue = self.session.run([self.incrementStep, self.critic.output],
 					{self.action: [action], self.state: [state], self.isTraining: False})
+				_, metricSums = self.session.run([self.updateMetrics, self.metrics],
+					{self.actionValue: actionValue.item(), self.reward: reward})
 				[self.logger.logScalar('Action/' + str(i), x, step) for i, x in enumerate(action)]
-				self.logger.logScalar('Action value', actionValue, step)
-				self.logger.logScalar('Reward', reward, step)
+				self.logger.writeSummary(metricSums, step)
 				if self.settings['render']:
 					self.env.render()
 			loss = 0
@@ -92,6 +94,22 @@ class Controller:
 
 	def _randomPolicy(self, _):
 		return self.noise.step() * (self.env.action_space.high - self.env.action_space.low)
+
+	def _setupMetrics(self):
+		self.updateMetrics = []
+		ema = tf.train.ExponentialMovingAverage(decay=0.9999)
+		# Mean action value
+		self.actionValue = tf.placeholder(tf.float32, shape=(), name='action_value')
+		self.updateMetrics.append(ema.apply([self.actionValue]))
+		self.meanValue = ema.average(self.actionValue)
+		tf.summary.scalar('Action value', self.meanValue, collections=['metrics'])
+		# Mean reward
+		self.reward = tf.placeholder(tf.float32, shape=(), name='reward')
+		self.updateMetrics.append(ema.apply([self.reward]))
+		self.meanReward = ema.average(self.reward)
+		tf.summary.scalar('Reward', self.meanReward, collections=['metrics'])
+		# Summary merging
+		self.metrics = tf.summary.merge_all('metrics')
 
 	def _setupModel(self):
 		self.action = tf.placeholder(tf.float32, (None, self.actionDim), name='action')
