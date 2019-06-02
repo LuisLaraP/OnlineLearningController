@@ -51,7 +51,7 @@ class Controller:
 		epoch = 0
 		step = 0
 		done = True
-		confidence = 0
+		confidence = 0.5
 		self.logger.checkpoint(self.session, 0)
 		while step < self.settings['steps']:
 			startTime = time.time()
@@ -61,7 +61,7 @@ class Controller:
 					state = self.env.reset()
 					self.noise.reset()
 					done = False
-				action = self._learnedPolicy(state) + self._randomPolicy(state)
+				action = confidence * self._learnedPolicy(state) + (1 - confidence) * self._randomPolicy(state)
 				newState, reward, done, _ = self.env.step(action)
 				if self.settings['controller-type'] == 'continuous':
 					done = False
@@ -72,13 +72,13 @@ class Controller:
 				_, metricSums, rewardVar = self.session.run([self.updateMetrics, self.metrics, self.rewardVariance],
 					{self.actionValue: actionValue.item(), self.confidence: confidence, self.reward: reward})
 				if rewardVar > 1:
-					confidence -= 0.00001
+					confidence -= 0.000005
 				else:
-					confidence += 0.00001
+					confidence += 0.000005
 				if confidence > 1:
 					confidence = 1
-				if confidence < 0:
-					confidence = 0
+				if confidence < 0.5:
+					confidence = 0.5
 				[self.logger.logScalar('Action/' + str(i), x, step) for i, x in enumerate(action)]
 				self.logger.writeSummary(metricSums, step)
 				if self.settings['render']:
