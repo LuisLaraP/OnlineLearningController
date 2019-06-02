@@ -96,18 +96,29 @@ class Controller:
 		return self.noise.step() * (self.env.action_space.high - self.env.action_space.low)
 
 	def _setupMetrics(self):
+		decay = 0.9999
 		self.updateMetrics = []
-		ema = tf.train.ExponentialMovingAverage(decay=0.9999)
-		# Mean action value
+		ema = tf.train.ExponentialMovingAverage(decay=decay)
+		# Action value mean
 		self.actionValue = tf.placeholder(tf.float32, shape=(), name='action_value')
 		self.updateMetrics.append(ema.apply([self.actionValue]))
 		self.meanValue = ema.average(self.actionValue)
 		tf.summary.scalar('Action value', self.meanValue, collections=['metrics'])
-		# Mean reward
+		# Reward mean
 		self.reward = tf.placeholder(tf.float32, shape=(), name='reward')
 		self.updateMetrics.append(ema.apply([self.reward]))
 		self.meanReward = ema.average(self.reward)
 		tf.summary.scalar('Reward', self.meanReward, collections=['metrics'])
+		# Reward variance
+		self.rewardVariance = tf.get_variable('reward_variance', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
+		incr = (1 - decay) * tf.square(self.reward - self.meanReward)
+		self.updateMetrics.append(tf.assign(self.rewardVariance, decay * (self.rewardVariance + incr)))
+		tf.summary.scalar('Reward variance', self.rewardVariance, collections=['metrics'])
+		# Value variance
+		self.valueVariance = tf.get_variable('value_variance', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
+		incr = (1 - decay) * tf.square(self.actionValue - self.meanValue)
+		self.updateMetrics.append(tf.assign(self.valueVariance, decay * (self.valueVariance + incr)))
+		tf.summary.scalar('Acion value variance', self.valueVariance, collections=['metrics'])
 		# Summary merging
 		self.metrics = tf.summary.merge_all('metrics')
 
