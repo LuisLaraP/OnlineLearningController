@@ -51,6 +51,7 @@ class Controller:
 		epoch = 0
 		step = 0
 		done = True
+		confidence = 0
 		self.logger.checkpoint(self.session, 0)
 		while step < self.settings['steps']:
 			startTime = time.time()
@@ -68,8 +69,16 @@ class Controller:
 				state = newState
 				step, actionValue = self.session.run([self.incrementStep, self.critic.output],
 					{self.action: [action], self.state: [state], self.isTraining: False})
-				_, metricSums = self.session.run([self.updateMetrics, self.metrics],
-					{self.actionValue: actionValue.item(), self.reward: reward})
+				_, metricSums, rewardVar = self.session.run([self.updateMetrics, self.metrics, self.rewardVariance],
+					{self.actionValue: actionValue.item(), self.confidence: confidence, self.reward: reward})
+				if rewardVar > 1:
+					confidence -= 0.00001
+				else:
+					confidence += 0.00001
+				if confidence > 1:
+					confidence = 1
+				if confidence < 0:
+					confidence = 0
 				[self.logger.logScalar('Action/' + str(i), x, step) for i, x in enumerate(action)]
 				self.logger.writeSummary(metricSums, step)
 				if self.settings['render']:
@@ -118,7 +127,10 @@ class Controller:
 		self.valueVariance = tf.get_variable('value_variance', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
 		incr = (1 - decay) * tf.square(self.actionValue - self.meanValue)
 		self.updateMetrics.append(tf.assign(self.valueVariance, decay * (self.valueVariance + incr)))
-		tf.summary.scalar('Acion value variance', self.valueVariance, collections=['metrics'])
+		tf.summary.scalar('Action value variance', self.valueVariance, collections=['metrics'])
+		# Confidence
+		self.confidence = tf.placeholder(tf.float32, shape=(), name='confidence')
+		tf.summary.scalar('Confidence', self.confidence, collections=['metrics'])
 		# Summary merging
 		self.metrics = tf.summary.merge_all('metrics')
 
