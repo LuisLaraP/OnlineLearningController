@@ -51,7 +51,6 @@ class Controller:
 		epoch = 0
 		step = 0
 		done = True
-		confidence = 0.5
 		self.logger.checkpoint(self.session, 0)
 		while step < self.settings['steps']:
 			startTime = time.time()
@@ -69,16 +68,8 @@ class Controller:
 				state = newState
 				step, actionValue = self.session.run([self.incrementStep, self.critic.output],
 					{self.action: [action], self.state: [state], self.isTraining: False})
-				_, metricSums, rewardVar = self.session.run([self.updateMetrics, self.metrics, self.rewardVariance],
-					{self.actionValue: actionValue.item(), self.confidence: confidence, self.reward: reward})
-				if rewardVar > 1:
-					confidence -= 0.000005
-				else:
-					confidence += 0.000005
-				if confidence > 1:
-					confidence = 1
-				if confidence < 0.5:
-					confidence = 0.5
+				_, metricSums = self.session.run([self.updateMetrics, self.metrics],
+					{self.actionValue: actionValue.item(), self.reward: reward})
 				[self.logger.logScalar('Action/' + str(i), x, step) for i, x in enumerate(action)]
 				self.logger.writeSummary(metricSums, step)
 				if self.settings['render']:
@@ -106,6 +97,7 @@ class Controller:
 
 	def _setupMetrics(self):
 		decay = 0.9999
+		confidenceStep = 5e-6
 		self.updateMetrics = []
 		with tf.variable_scope('metrics'):
 			ema = tf.train.ExponentialMovingAverage(decay=decay)
@@ -126,6 +118,8 @@ class Controller:
 			self.updateMetrics.append(tf.assign(valueCusumNeg, tf.minimum(0., decay * valueCusumNeg - self.actionValue + self.meanValue)))
 			self.valueCusum = valueCusumPos - valueCusumNeg
 			self.updateMetrics.append(self.valueCusum)
+			tf.summary.scalar('Action value cusum pos', valueCusumPos, collections=['metrics'])
+			tf.summary.scalar('Action value cusum neg', valueCusumNeg, collections=['metrics'])
 			tf.summary.scalar('Action value cusum', self.valueCusum, collections=['metrics'])
 			# Reward mean
 			self.reward = tf.placeholder(tf.float32, shape=(), name='reward')
@@ -138,7 +132,11 @@ class Controller:
 			self.updateMetrics.append(tf.assign(self.rewardVariance, decay * (self.rewardVariance + incr)))
 			tf.summary.scalar('Reward variance', self.rewardVariance, collections=['metrics'])
 			# Confidence
-			self.confidence = tf.placeholder(tf.float32, shape=(), name='confidence')
+			valueConfidence = tf.get_variable('value_confidence', shape=(), dtype = tf.float32, initializer=tf.initializers.zeros)
+			maxValueCusum = tf.get_variable('max_value_cusum', shape=(), dtype = tf.float32, initializer=tf.initializers.zeros)
+			self.updateMetrics.append(tf.assign(maxValueCusum, tf.maximum(maxValueCusum, self.valueCusum)))
+			self.updateMetrics.append(tf.assign(valueConfidence, tf.clip_by_value(valueConfidence + confidenceStep * tf.sign(maxValueCusum * 0.25 - self.valueCusum), 0, 0.5)))
+			self.confidence = valueConfidence
 			tf.summary.scalar('Confidence', self.confidence, collections=['metrics'])
 			# Summary merging
 			self.metrics = tf.summary.merge_all('metrics')
