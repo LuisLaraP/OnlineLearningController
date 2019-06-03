@@ -107,40 +107,41 @@ class Controller:
 	def _setupMetrics(self):
 		decay = 0.9999
 		self.updateMetrics = []
-		ema = tf.train.ExponentialMovingAverage(decay=decay)
-		# Action value mean
-		self.actionValue = tf.placeholder(tf.float32, shape=(), name='action_value')
-		self.updateMetrics.append(ema.apply([self.actionValue]))
-		self.meanValue = ema.average(self.actionValue)
-		tf.summary.scalar('Action value', self.meanValue, collections=['metrics'])
-		# Action value variance
-		self.valueVariance = tf.get_variable('value_variance', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
-		incr = (1 - decay) * tf.square(self.actionValue - self.meanValue)
-		self.updateMetrics.append(tf.assign(self.valueVariance, decay * (self.valueVariance + incr)))
-		tf.summary.scalar('Action value variance', self.valueVariance, collections=['metrics'])
-		# Action value cusum
-		valueCusumPos = tf.get_variable('value_cusum_pos', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
-		valueCusumNeg = tf.get_variable('value_cusum_neg', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
-		self.updateMetrics.append(tf.assign(valueCusumPos, tf.maximum(0., decay * valueCusumPos + self.actionValue - self.meanValue)))
-		self.updateMetrics.append(tf.assign(valueCusumNeg, tf.minimum(0., decay * valueCusumNeg - self.actionValue + self.meanValue)))
-		self.valueCusum = valueCusumPos - valueCusumNeg
-		self.updateMetrics.append(self.valueCusum)
-		tf.summary.scalar('Action value cusum', self.valueCusum, collections=['metrics'])
-		# Reward mean
-		self.reward = tf.placeholder(tf.float32, shape=(), name='reward')
-		self.updateMetrics.append(ema.apply([self.reward]))
-		self.meanReward = ema.average(self.reward)
-		tf.summary.scalar('Reward', self.meanReward, collections=['metrics'])
-		# Reward variance
-		self.rewardVariance = tf.get_variable('reward_variance', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
-		incr = (1 - decay) * tf.square(self.reward - self.meanReward)
-		self.updateMetrics.append(tf.assign(self.rewardVariance, decay * (self.rewardVariance + incr)))
-		tf.summary.scalar('Reward variance', self.rewardVariance, collections=['metrics'])
-		# Confidence
-		self.confidence = tf.placeholder(tf.float32, shape=(), name='confidence')
-		tf.summary.scalar('Confidence', self.confidence, collections=['metrics'])
-		# Summary merging
-		self.metrics = tf.summary.merge_all('metrics')
+		with tf.variable_scope('metrics'):
+			ema = tf.train.ExponentialMovingAverage(decay=decay)
+			# Action value mean
+			self.actionValue = tf.placeholder(tf.float32, shape=(), name='action_value')
+			self.updateMetrics.append(ema.apply([self.actionValue]))
+			self.meanValue = ema.average(self.actionValue)
+			tf.summary.scalar('Action value', self.meanValue, collections=['metrics'])
+			# Action value variance
+			self.valueVariance = tf.get_variable('value_variance', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
+			incr = (1 - decay) * tf.square(self.actionValue - self.meanValue)
+			self.updateMetrics.append(tf.assign(self.valueVariance, decay * (self.valueVariance + incr)))
+			tf.summary.scalar('Action value variance', self.valueVariance, collections=['metrics'])
+			# Action value cusum
+			valueCusumPos = tf.get_variable('value_cusum_pos', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
+			valueCusumNeg = tf.get_variable('value_cusum_neg', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
+			self.updateMetrics.append(tf.assign(valueCusumPos, tf.maximum(0., decay * valueCusumPos + self.actionValue - self.meanValue)))
+			self.updateMetrics.append(tf.assign(valueCusumNeg, tf.minimum(0., decay * valueCusumNeg - self.actionValue + self.meanValue)))
+			self.valueCusum = valueCusumPos - valueCusumNeg
+			self.updateMetrics.append(self.valueCusum)
+			tf.summary.scalar('Action value cusum', self.valueCusum, collections=['metrics'])
+			# Reward mean
+			self.reward = tf.placeholder(tf.float32, shape=(), name='reward')
+			self.updateMetrics.append(ema.apply([self.reward]))
+			self.meanReward = ema.average(self.reward)
+			tf.summary.scalar('Reward', self.meanReward, collections=['metrics'])
+			# Reward variance
+			self.rewardVariance = tf.get_variable('reward_variance', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
+			incr = (1 - decay) * tf.square(self.reward - self.meanReward)
+			self.updateMetrics.append(tf.assign(self.rewardVariance, decay * (self.rewardVariance + incr)))
+			tf.summary.scalar('Reward variance', self.rewardVariance, collections=['metrics'])
+			# Confidence
+			self.confidence = tf.placeholder(tf.float32, shape=(), name='confidence')
+			tf.summary.scalar('Confidence', self.confidence, collections=['metrics'])
+			# Summary merging
+			self.metrics = tf.summary.merge_all('metrics')
 
 	def _setupModel(self):
 		self.action = tf.placeholder(tf.float32, (None, self.actionDim), name='action')
