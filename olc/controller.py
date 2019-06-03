@@ -61,7 +61,7 @@ class Controller:
 					state = self.env.reset()
 					self.noise.reset()
 					done = False
-				action = confidence * self._learnedPolicy(state) + (1 - confidence) * self._randomPolicy(state)
+				action = self._learnedPolicy(state) + self._randomPolicy(state)
 				newState, reward, done, _ = self.env.step(action)
 				if self.settings['controller-type'] == 'continuous':
 					done = False
@@ -113,6 +113,15 @@ class Controller:
 		self.updateMetrics.append(ema.apply([self.actionValue]))
 		self.meanValue = ema.average(self.actionValue)
 		tf.summary.scalar('Action value', self.meanValue, collections=['metrics'])
+		# Action value variance
+		self.valueVariance = tf.get_variable('value_variance', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
+		incr = (1 - decay) * tf.square(self.actionValue - self.meanValue)
+		self.updateMetrics.append(tf.assign(self.valueVariance, decay * (self.valueVariance + incr)))
+		tf.summary.scalar('Action value variance', self.valueVariance, collections=['metrics'])
+		# Action value cusum
+		self.valueCusum = tf.get_variable('value_cusum', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
+		self.updateMetrics.append(tf.assign(self.valueCusum, tf.maximum(0., decay * self.valueCusum + self.actionValue - self.meanValue)))
+		tf.summary.scalar('Action value cusum', self.valueCusum, collections=['metrics'])
 		# Reward mean
 		self.reward = tf.placeholder(tf.float32, shape=(), name='reward')
 		self.updateMetrics.append(ema.apply([self.reward]))
@@ -123,11 +132,6 @@ class Controller:
 		incr = (1 - decay) * tf.square(self.reward - self.meanReward)
 		self.updateMetrics.append(tf.assign(self.rewardVariance, decay * (self.rewardVariance + incr)))
 		tf.summary.scalar('Reward variance', self.rewardVariance, collections=['metrics'])
-		# Value variance
-		self.valueVariance = tf.get_variable('value_variance', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
-		incr = (1 - decay) * tf.square(self.actionValue - self.meanValue)
-		self.updateMetrics.append(tf.assign(self.valueVariance, decay * (self.valueVariance + incr)))
-		tf.summary.scalar('Action value variance', self.valueVariance, collections=['metrics'])
 		# Confidence
 		self.confidence = tf.placeholder(tf.float32, shape=(), name='confidence')
 		tf.summary.scalar('Confidence', self.confidence, collections=['metrics'])
