@@ -115,7 +115,7 @@ class Controller:
 			valueCusumPos = tf.get_variable('value_cusum_pos', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
 			valueCusumNeg = tf.get_variable('value_cusum_neg', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
 			self.updateMetrics.append(tf.assign(valueCusumPos, tf.maximum(0., decay * valueCusumPos + self.actionValue - self.meanValue)))
-			self.updateMetrics.append(tf.assign(valueCusumNeg, tf.minimum(0., decay * valueCusumNeg - self.actionValue + self.meanValue)))
+			self.updateMetrics.append(tf.assign(valueCusumNeg, tf.minimum(0., decay * valueCusumNeg + self.actionValue + self.meanValue)))
 			self.valueCusum = valueCusumPos - valueCusumNeg
 			self.updateMetrics.append(self.valueCusum)
 			tf.summary.scalar('Action value cusum pos', valueCusumPos, collections=['metrics'])
