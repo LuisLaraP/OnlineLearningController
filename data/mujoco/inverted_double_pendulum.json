@@ -1,7 +1,0 @@
-{
-	"task": {
-		"name": "InvertedDoublePendulum-v2"
-	},
-	"steps": 150000,
-	"save-interval": 10000
-}
