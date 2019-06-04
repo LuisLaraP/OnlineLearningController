@@ -85,3 +85,8 @@ class Reacher2(RoboschoolMujocoXmlEnv):
 class Reacher2Base(Reacher2):
 
     definitionFile = 'reacher2.xml'
+
+
+class Reacher2Length(Reacher2):
+
+    definitionFile = 'reacher2length.xml'
