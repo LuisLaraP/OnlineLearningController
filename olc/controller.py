@@ -132,6 +132,16 @@ class Controller:
 			incr = (1 - decay) * tf.square(self.reward - self.meanReward)
 			self.updateMetrics.append(tf.assign(self.rewardVariance, decay * (self.rewardVariance + incr)))
 			tf.summary.scalar('Reward variance', self.rewardVariance, collections=['metrics'])
+			# Reward cusum
+			rewardCusumPos = tf.get_variable('reward_cusum_pos', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
+			rewardCusumNeg = tf.get_variable('reward_cusum_neg', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
+			self.updateMetrics.append(tf.assign(rewardCusumPos, tf.maximum(0., decay * rewardCusumPos + self.reward - self.meanReward)))
+			self.updateMetrics.append(tf.assign(rewardCusumNeg, tf.minimum(0., decay * rewardCusumNeg + self.reward + self.meanReward)))
+			self.rewardCusum = rewardCusumPos - rewardCusumNeg
+			self.updateMetrics.append(self.rewardCusum)
+			tf.summary.scalar('Reward cusum pos', rewardCusumPos, collections=['metrics'])
+			tf.summary.scalar('Reward cusum neg', rewardCusumNeg, collections=['metrics'])
+			tf.summary.scalar('Reward cusum', self.rewardCusum, collections=['metrics'])
 			# Confidence
 			valueConfidence = tf.get_variable('value_confidence', shape=(), dtype = tf.float32, initializer=tf.initializers.zeros)
 			maxValueCusum = tf.get_variable('max_value_cusum', shape=(), dtype = tf.float32, initializer=tf.initializers.zeros)
