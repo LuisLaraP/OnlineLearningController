@@ -143,11 +143,9 @@ class Controller:
 			tf.summary.scalar('Reward cusum neg', rewardCusumNeg, collections=['metrics'])
 			tf.summary.scalar('Reward cusum', self.rewardCusum, collections=['metrics'])
 			# Confidence
-			valueConfidence = tf.get_variable('value_confidence', shape=(), dtype = tf.float32, initializer=tf.initializers.zeros)
-			maxValueCusum = tf.get_variable('max_value_cusum', shape=(), dtype = tf.float32, initializer=tf.initializers.zeros)
-			self.updateMetrics.append(tf.assign(maxValueCusum, tf.maximum(maxValueCusum, self.valueCusum)))
-			self.updateMetrics.append(tf.assign(valueConfidence, tf.clip_by_value(valueConfidence + confidenceStep * tf.sign(self.settings["cusum-threshold"] - self.valueCusum), 0, 0.5)))
-			self.confidence = valueConfidence
+			rewardConfidence = tf.get_variable('reward_confidence', shape=(), dtype = tf.float32, initializer=tf.initializers.zeros)
+			self.updateMetrics.append(tf.assign(rewardConfidence, tf.clip_by_value(rewardConfidence + confidenceStep * tf.sign(self.settings["cusum-threshold"] - self.rewardCusum), 0, 0.5)))
+			self.confidence = rewardConfidence
 			tf.summary.scalar('Confidence', self.confidence, collections=['metrics'])
 			# Summary merging
 			self.metrics = tf.summary.merge_all('metrics')
