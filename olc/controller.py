@@ -107,11 +107,6 @@ class Controller:
 			self.updateMetrics.append(ema.apply([self.actionValue]))
 			self.meanValue = ema.average(self.actionValue)
 			tf.summary.scalar('Action value', self.meanValue, collections=['metrics'])
-			# Action value variance
-			self.valueVariance = tf.get_variable('value_variance', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
-			incr = (1 - decay) * tf.square(self.actionValue - self.meanValue)
-			self.updateMetrics.append(tf.assign(self.valueVariance, decay * (self.valueVariance + incr)))
-			tf.summary.scalar('Action value variance', self.valueVariance, collections=['metrics'])
 			# Action value cusum
 			valueCusumPos = tf.get_variable('value_cusum_pos', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
 			valueCusumNeg = tf.get_variable('value_cusum_neg', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
@@ -127,11 +122,6 @@ class Controller:
 			self.updateMetrics.append(ema.apply([self.reward]))
 			self.meanReward = ema.average(self.reward)
 			tf.summary.scalar('Reward', self.meanReward, collections=['metrics'])
-			# Reward variance
-			self.rewardVariance = tf.get_variable('reward_variance', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
-			incr = (1 - decay) * tf.square(self.reward - self.meanReward)
-			self.updateMetrics.append(tf.assign(self.rewardVariance, decay * (self.rewardVariance + incr)))
-			tf.summary.scalar('Reward variance', self.rewardVariance, collections=['metrics'])
 			# Reward cusum
 			rewardCusumPos = tf.get_variable('reward_cusum_pos', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
 			rewardCusumNeg = tf.get_variable('reward_cusum_neg', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
