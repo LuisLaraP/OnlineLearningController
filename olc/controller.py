@@ -136,7 +136,7 @@ class Controller:
 			valueConfidence = tf.get_variable('value_confidence', shape=(), dtype = tf.float32, initializer=tf.initializers.zeros)
 			maxValueCusum = tf.get_variable('max_value_cusum', shape=(), dtype = tf.float32, initializer=tf.initializers.zeros)
 			self.updateMetrics.append(tf.assign(maxValueCusum, tf.maximum(maxValueCusum, self.valueCusum)))
-			self.updateMetrics.append(tf.assign(valueConfidence, tf.clip_by_value(valueConfidence + confidenceStep * tf.sign(maxValueCusum * 0.25 - self.valueCusum), 0, 0.5)))
+			self.updateMetrics.append(tf.assign(valueConfidence, tf.clip_by_value(valueConfidence + confidenceStep * tf.sign(self.settings["cusum-threshold"] - self.valueCusum), 0, 0.5)))
 			self.confidence = valueConfidence
 			tf.summary.scalar('Confidence', self.confidence, collections=['metrics'])
 			# Summary merging
