@@ -1,0 +1,8 @@
+{
+	"task": {
+		"name": "Reacher2joint-v0"
+	},
+	"steps": 500000,
+	"save-interval": 10000,
+	"render": true
+}

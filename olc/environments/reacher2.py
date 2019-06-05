@@ -90,3 +90,13 @@ class Reacher2Base(Reacher2):
 class Reacher2Length(Reacher2):
 
     definitionFile = 'reacher2length.xml'
+
+
+class Reacher2Joint(Reacher2):
+
+    definitionFile = 'reacher2.xml'
+
+    def apply_action(self, a):
+        assert(np.isfinite(a).all())
+        self.central_joint.set_motor_torque(0.05*float(np.clip(a[0], -1, +1)))
+        self.elbow_joint.set_motor_torque(0)
