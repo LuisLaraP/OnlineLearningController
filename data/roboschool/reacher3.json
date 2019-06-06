@@ -3,5 +3,6 @@
 		"name": "Reacher3-v0"
 	},
 	"steps": 500000,
-	"save-interval": 10000
+	"save-interval": 10000,
+	"cusum-threshold": 4e3
 }
