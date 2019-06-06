@@ -9,7 +9,7 @@ class Reacher3(RoboschoolMujocoXmlEnv):
     Similar to MuJoCo reacher.
     '''
     def __init__(self):
-        RoboschoolMujocoXmlEnv.__init__(self, 'reacher3.xml', 'body0', action_dim=3, obs_dim=11)
+        RoboschoolMujocoXmlEnv.__init__(self, self.definitionFile, 'body0', action_dim=3, obs_dim=11)
 
     def create_single_player_scene(self):
         return SingleRobotEmptyScene(gravity=0.0, timestep=0.0165, frame_skip=1)
@@ -85,3 +85,13 @@ class Reacher3(RoboschoolMujocoXmlEnv):
         x *= 0.5
         y *= 0.5
         self.camera.move_and_look_at(0.3, 0.3, 0.3, x, y, z)
+
+
+class Reacher3Base(Reacher3):
+
+    definitionFile = 'reacher3.xml'
+
+
+class Reacher3Length(Reacher3):
+
+    definitionFile = 'reacher3length.xml'

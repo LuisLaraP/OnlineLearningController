@@ -1,0 +1,8 @@
+{
+	"task": {
+		"name": "Reacher3length-v0"
+	},
+	"steps": 500000,
+	"save-interval": 10000,
+	"cusum-threshold": 4e3
+}
