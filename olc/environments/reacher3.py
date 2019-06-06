@@ -30,8 +30,8 @@ class Reacher3(RoboschoolMujocoXmlEnv):
     def apply_action(self, a):
         assert( np.isfinite(a).all() )
         self.central_joint.set_motor_torque( 0.05*float(np.clip(a[0], -1, +1)) )
-        self.elbow_joint.set_motor_torque( 0.05*float(np.clip(a[1], -1, +1)) )
-        self.shoulder_joint.set_motor_torque( 0.05*float(np.clip(a[2], -1, +1)) )
+        self.shoulder_joint.set_motor_torque( 0.05*float(np.clip(a[1], -1, +1)) )
+        self.elbow_joint.set_motor_torque( 0.05*float(np.clip(a[2], -1, +1)) )
 
     def calc_state(self):
         theta,      self.theta_dot = self.central_joint.current_relative_position()
@@ -95,3 +95,14 @@ class Reacher3Base(Reacher3):
 class Reacher3Length(Reacher3):
 
     definitionFile = 'reacher3length.xml'
+
+
+class Reacher3Joint(Reacher3):
+
+    definitionFile = 'reacher3.xml'
+
+    def apply_action(self, a):
+        assert(np.isfinite(a).all())
+        self.central_joint.set_motor_torque(0.05*float(np.clip(a[0], -1, +1)))
+        self.shoulder_joint.set_motor_torque(0)
+        self.elbow_joint.set_motor_torque(0.05*float(np.clip(a[2], -1, +1)))
