@@ -43,20 +43,21 @@ class ReachVelocity:
 		self.sim.setVelocities(action)
 		self.sim.step()
 		self.pose = self.sim.getRobotState()[0]
-		reward = self._computeReward()
+		reward = self._computeReward(action)
 		reset = self.curStep >= self.settings['max-steps']
 		return np.concatenate((self.reference, self.pose)), reward, reset, None
 
 	def _computePotential(self):
-		return -100 * self.sim.readDistance(self.settings['error-object-name'])
+		return -1000 * self.sim.readDistance(self.settings['error-object-name'])
 
-	def _computeReward(self):
+	def _computeReward(self, action):
 		newPotential = self._computePotential()
 		rewardPotential = newPotential - self.potential
 		self.potential = newPotential
+		rewardAction = -0.1 * np.sum(np.abs(action))
 		stuckJoints = np.logical_or(
 			np.isclose(self.pose, self.settings['robot']['joint-min']),
 			np.isclose(self.pose, self.settings['robot']['joint-max'])
 		)
 		rewardStuck = -np.count_nonzero(stuckJoints)
-		return rewardPotential + rewardStuck
+		return rewardPotential + rewardAction + rewardStuck
