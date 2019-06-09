@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 from gym.spaces import Box
 
@@ -29,6 +31,8 @@ class ReachVelocity:
 		self.sim.step()
 		self.pose = self.sim.getRobotState()[0]
 		self.curStep = 0
+		time.sleep(0.05)
+		self.potential = self._computePotential()
 		return np.concatenate((self.reference, self.pose))
 
 	def render(self):
@@ -43,5 +47,11 @@ class ReachVelocity:
 		reset = self.curStep >= self.settings['max-steps']
 		return np.concatenate((self.reference, self.pose)), reward, reset, None
 
+	def _computePotential(self):
+		return -10 * self.sim.readDistance(self.settings['error-object-name'])
+
 	def _computeReward(self):
-		return 0
+		newPotential = self._computePotential()
+		dPotential = newPotential - self.potential
+		self.potential = newPotential
+		return dPotential
