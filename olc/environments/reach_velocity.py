@@ -39,5 +39,9 @@ class ReachVelocity:
 		self.sim.setVelocities(action)
 		self.sim.step()
 		self.pose = self.sim.getRobotState()[0]
+		reward = self._computeReward()
 		reset = self.curStep >= self.settings['max-steps']
-		return np.concatenate((self.reference, self.pose)), 0, reset, None
+		return np.concatenate((self.reference, self.pose)), reward, reset, None
+
+	def _computeReward(self):
+		return 0
