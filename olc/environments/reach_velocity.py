@@ -20,7 +20,7 @@ class ReachVelocity:
 	def reset(self):
 		self.sim.stop()
 		state = self.observation_space.sample()
-		self.reference = self.state[:len(self.settings['robot']['workspace-min'])]
+		self.reference = state[:len(self.settings['robot']['workspace-min'])]
 		self.sim.setDummyPosition(self.settings['target-object-name'], self.reference)
 		self.pose = state[len(self.settings['robot']['workspace-min']):]
 		self.sim.setPose(self.pose)
@@ -39,7 +39,5 @@ class ReachVelocity:
 		self.sim.setVelocities(action)
 		self.sim.step()
 		self.pose = self.sim.getRobotState()[0]
-		error = self.sim.readDistance(self.settings['error-object-name'])
-		reward = -error - np.linalg.norm(self.state[-self.action_space.low.size:]) * self.rewardVelFactor
 		reset = self.curStep >= self.settings['max-steps']
-		return np.concatenate(self.reference, self.pose), reward, reset, None
+		return np.concatenate((self.reference, self.pose)), 0, reset, None
