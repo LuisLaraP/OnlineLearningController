@@ -48,10 +48,15 @@ class ReachVelocity:
 		return np.concatenate((self.reference, self.pose)), reward, reset, None
 
 	def _computePotential(self):
-		return -10 * self.sim.readDistance(self.settings['error-object-name'])
+		return -100 * self.sim.readDistance(self.settings['error-object-name'])
 
 	def _computeReward(self):
 		newPotential = self._computePotential()
-		dPotential = newPotential - self.potential
+		rewardPotential = newPotential - self.potential
 		self.potential = newPotential
-		return dPotential
+		stuckJoints = np.logical_or(
+			np.isclose(self.pose, self.settings['robot']['joint-min']),
+			np.isclose(self.pose, self.settings['robot']['joint-max'])
+		)
+		rewardStuck = -np.count_nonzero(stuckJoints)
+		return rewardPotential + rewardStuck
