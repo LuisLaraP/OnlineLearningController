@@ -19,17 +19,17 @@ class ReachVelocity:
 
 	def reset(self):
 		self.sim.stop()
-		self.state = self.observation_space.sample()
-		ref = self.state[:len(self.settings['robot']['workspace-min'])]
-		self.sim.setDummyPosition(self.settings['target-object-name'], ref)
-		pose = self.state[len(self.settings['robot']['workspace-min']):]
-		self.sim.setPose(pose)
+		state = self.observation_space.sample()
+		self.reference = self.state[:len(self.settings['robot']['workspace-min'])]
+		self.sim.setDummyPosition(self.settings['target-object-name'], self.reference)
+		self.pose = state[len(self.settings['robot']['workspace-min']):]
+		self.sim.setPose(self.pose)
 		self.sim.setVelocities(np.zeros(self.action_space.low.size))
 		self.sim.start()
 		self.sim.step()
-		self.state[len(self.settings['robot']['workspace-min']):] = self.sim.getRobotState()[0]
+		self.pose = self.sim.getRobotState()[0]
 		self.curStep = 0
-		return self.state
+		return np.concatenate((self.reference, self.pose))
 
 	def render(self):
 		pass
@@ -38,8 +38,8 @@ class ReachVelocity:
 		self.curStep += 1
 		self.sim.setVelocities(action)
 		self.sim.step()
-		self.state[len(self.settings['robot']['workspace-min']):] = self.sim.getRobotState()[0]
+		self.pose = self.sim.getRobotState()[0]
 		error = self.sim.readDistance(self.settings['error-object-name'])
 		reward = -error - np.linalg.norm(self.state[-self.action_space.low.size:]) * self.rewardVelFactor
 		reset = self.curStep >= self.settings['max-steps']
-		return self.state, reward, reset, None
+		return np.concatenate(self.reference, self.pose), reward, reset, None
