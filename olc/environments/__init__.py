@@ -61,6 +61,12 @@ gym.envs.register(
 	max_episode_steps=100
 )
 
+gym.envs.register(
+	'Reacher7-v0',
+	entry_point='olc.environments.reacher7:Reacher7',
+	max_episode_steps=100
+)
+
 # Custom ---------------------------------------------------------------------
 
 register('ReachTorque', ReachTorque)

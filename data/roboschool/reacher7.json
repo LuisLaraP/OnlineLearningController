@@ -1,0 +1,9 @@
+{
+	"task": {
+		"name": "Reacher7-v0"
+	},
+	"steps": 500000,
+	"save-interval": 10000,
+	"cusum-threshold": 200,
+	"render": true
+}
