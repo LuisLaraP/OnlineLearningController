@@ -36,7 +36,7 @@ class Reacher7(RoboschoolMujocoXmlEnv):
 		action = 0.05 * np.clip(a, -1, 1)
 		for i in range(self.action_dim):
 			key = 'joint' + str(i)
-			self.jdict[key].set_motor_torque(action[i])
+			self.jdict[key].set_motor_torque(action[i].item())
 
 	def calc_state(self):
 		for i in range(self.action_dim):
