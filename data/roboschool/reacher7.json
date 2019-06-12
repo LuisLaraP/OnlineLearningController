@@ -4,6 +4,5 @@
 	},
 	"steps": 1000000,
 	"save-interval": 10000,
-	"cusum-threshold": 200,
-	"render": false
+	"cusum-threshold": 2000
 }

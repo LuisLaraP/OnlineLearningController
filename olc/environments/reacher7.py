@@ -8,8 +8,8 @@ class Reacher7(RoboschoolMujocoXmlEnv):
 	definitionFile = 'reacher7.xml'
 
 	def __init__(self):
-		self.action_dim = 4
-		self.obs_dim = 11
+		self.action_dim = 6
+		self.obs_dim = 15
 		RoboschoolMujocoXmlEnv.__init__(self, self.definitionFile, 'body0', action_dim=self.action_dim, obs_dim=self.obs_dim)
 		self.theta = np.zeros(self.action_dim)
 		self.theta_dot = np.zeros(self.action_dim)
