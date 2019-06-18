@@ -110,9 +110,9 @@ class Controller:
 			# Action value cusum
 			valueCusumPos = tf.get_variable('value_cusum_pos', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
 			valueCusumNeg = tf.get_variable('value_cusum_neg', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
-			self.updateMetrics.append(tf.assign(valueCusumPos, tf.maximum(0., decay * valueCusumPos + self.actionValue - self.meanValue)))
-			self.updateMetrics.append(tf.assign(valueCusumNeg, tf.minimum(0., decay * valueCusumNeg + self.actionValue + self.meanValue)))
-			self.valueCusum = valueCusumPos - valueCusumNeg
+			self.updateMetrics.append(tf.assign(valueCusumPos, decay * tf.maximum(0., valueCusumPos + self.actionValue - self.meanValue)))
+			self.updateMetrics.append(tf.assign(valueCusumNeg, decay * tf.minimum(0., valueCusumNeg + self.actionValue + self.meanValue)))
+			self.valueCusum = valueCusumPos + valueCusumNeg
 			self.updateMetrics.append(self.valueCusum)
 			tf.summary.scalar('Action value cusum pos', valueCusumPos, collections=['metrics'])
 			tf.summary.scalar('Action value cusum neg', valueCusumNeg, collections=['metrics'])
@@ -125,16 +125,16 @@ class Controller:
 			# Reward cusum
 			rewardCusumPos = tf.get_variable('reward_cusum_pos', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
 			rewardCusumNeg = tf.get_variable('reward_cusum_neg', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
-			self.updateMetrics.append(tf.assign(rewardCusumPos, tf.maximum(0., decay * rewardCusumPos + self.reward - self.meanReward)))
-			self.updateMetrics.append(tf.assign(rewardCusumNeg, tf.minimum(0., decay * rewardCusumNeg + self.reward + self.meanReward)))
-			self.rewardCusum = rewardCusumPos - rewardCusumNeg
+			self.updateMetrics.append(tf.assign(rewardCusumPos, decay * tf.maximum(0., rewardCusumPos + self.reward - self.meanReward)))
+			self.updateMetrics.append(tf.assign(rewardCusumNeg, decay * tf.minimum(0., rewardCusumNeg + self.reward + self.meanReward)))
+			self.rewardCusum = rewardCusumPos + rewardCusumNeg
 			self.updateMetrics.append(self.rewardCusum)
 			tf.summary.scalar('Reward cusum pos', rewardCusumPos, collections=['metrics'])
 			tf.summary.scalar('Reward cusum neg', rewardCusumNeg, collections=['metrics'])
 			tf.summary.scalar('Reward cusum', self.rewardCusum, collections=['metrics'])
 			# Confidence
 			rewardConfidence = tf.get_variable('reward_confidence', shape=(), dtype = tf.float32, initializer=tf.initializers.zeros)
-			self.updateMetrics.append(tf.assign(rewardConfidence, tf.clip_by_value(rewardConfidence + confidenceStep * tf.sign(self.settings["cusum-threshold"] - self.rewardCusum), 0, 0.5)))
+			self.updateMetrics.append(tf.assign(rewardConfidence, tf.clip_by_value(rewardConfidence + confidenceStep * tf.sign(self.settings["cusum-threshold"] - tf.abs(self.rewardCusum)), 0, 0.5)))
 			self.confidence = rewardConfidence
 			tf.summary.scalar('Confidence', self.confidence, collections=['metrics'])
 			# Summary merging
