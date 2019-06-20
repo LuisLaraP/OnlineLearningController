@@ -15,15 +15,16 @@ class ReplayBuffer:
 		Maximum number of elements to be stored.
 	"""
 
-	def __init__(self, size, actionDim, stateDim):
-		self.size = size
-		self.nElem = 0
-		self.nextIdx = 0
-		self.iState = np.zeros((size, stateDim))
-		self.action = np.zeros((size, actionDim))
-		self.reward = np.zeros(size)
-		self.fState = np.zeros((size, stateDim))
-		self.terminal = np.zeros(size, bool)
+	def __init__(self, max_capacity, actionDim, stateDim):
+		self.max_capacity = max_capacity
+		self.capacity = max_capacity
+		self.head = 0
+		self.size = 0
+		self.iState = np.zeros((max_capacity, stateDim))
+		self.action = np.zeros((max_capacity, actionDim))
+		self.reward = np.zeros(max_capacity)
+		self.fState = np.zeros((max_capacity, stateDim))
+		self.terminal = np.zeros(max_capacity, bool)
 
 	def storeTransition(self, si, a, r, sf, t):
 		"""Add the given transition to the buffer.
@@ -43,14 +44,14 @@ class ReplayBuffer:
 		t : bool
 			True if the given transition was the last in its episode.
 		"""
-		if self.nElem < self.size:
-			self.nElem += 1
-		self.iState[self.nextIdx, :] = si
-		self.action[self.nextIdx, :] = a
-		self.reward[self.nextIdx] = r
-		self.fState[self.nextIdx, :] = sf
-		self.terminal[self.nextIdx] = t
-		self.nextIdx = (self.nextIdx + 1) % self.size
+		self.iState[self.head, :] = si
+		self.action[self.head, :] = a
+		self.reward[self.head] = r
+		self.fState[self.head, :] = sf
+		self.terminal[self.head] = t
+		if self.size < self.capacity:
+			self.size += 1
+		self.head = (self.head + 1) % self.max_capacity
 
 	def sample(self, n):
 		"""Return a random set of transitions from the buffer.
@@ -76,7 +77,8 @@ class ReplayBuffer:
 		terminal : List of bool
 			True if the given transition was the last in its episode.
 		"""
-		if n > self.nElem:
+		if n > self.size:
 			return [], [], [], [], []
-		idx = random.sample(range(self.nElem), n)
+		idx = np.random.choice(self.size, n, replace=False)
+		idx = self.head - idx - 1
 		return self.iState[idx, :], self.action[idx, :], self.reward[idx], self.fState[idx, :], self.terminal[idx]
