@@ -111,8 +111,8 @@ class Controller:
 			valueCusumPos = tf.get_variable('value_cusum_pos', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
 			valueCusumNeg = tf.get_variable('value_cusum_neg', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
 			self.updateMetrics.append(tf.assign(valueCusumPos, decay * tf.maximum(0., valueCusumPos + self.actionValue - self.meanValue)))
-			self.updateMetrics.append(tf.assign(valueCusumNeg, decay * tf.minimum(0., valueCusumNeg + self.actionValue + self.meanValue)))
-			self.valueCusum = valueCusumPos + valueCusumNeg
+			self.updateMetrics.append(tf.assign(valueCusumNeg, decay * tf.minimum(0., valueCusumNeg + self.actionValue - self.meanValue)))
+			self.valueCusum = valueCusumPos - valueCusumNeg
 			self.updateMetrics.append(self.valueCusum)
 			tf.summary.scalar('Action value cusum pos', valueCusumPos, collections=['metrics'])
 			tf.summary.scalar('Action value cusum neg', valueCusumNeg, collections=['metrics'])
@@ -126,8 +126,8 @@ class Controller:
 			rewardCusumPos = tf.get_variable('reward_cusum_pos', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
 			rewardCusumNeg = tf.get_variable('reward_cusum_neg', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
 			self.updateMetrics.append(tf.assign(rewardCusumPos, decay * tf.maximum(0., rewardCusumPos + self.reward - self.meanReward)))
-			self.updateMetrics.append(tf.assign(rewardCusumNeg, decay * tf.minimum(0., rewardCusumNeg + self.reward + self.meanReward)))
-			self.rewardCusum = rewardCusumPos + rewardCusumNeg
+			self.updateMetrics.append(tf.assign(rewardCusumNeg, decay * tf.minimum(0., rewardCusumNeg + self.reward - self.meanReward)))
+			self.rewardCusum = rewardCusumPos - rewardCusumNeg
 			self.updateMetrics.append(self.rewardCusum)
 			tf.summary.scalar('Reward cusum pos', rewardCusumPos, collections=['metrics'])
 			tf.summary.scalar('Reward cusum neg', rewardCusumNeg, collections=['metrics'])
