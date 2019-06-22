@@ -97,8 +97,8 @@ class Controller:
 		return self.noise.step() * (self.env.action_space.high - self.env.action_space.low)
 
 	def _setupMetrics(self):
-		decay = 0.9999
-		confidenceStep = 5e-6
+		decay = self.settings['metric-decay']
+		confidenceStep = self.settings['confidence-step']
 		self.updateMetrics = []
 		with tf.variable_scope('metrics'):
 			ema = tf.train.ExponentialMovingAverage(decay=decay)

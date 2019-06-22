@@ -1,9 +1,11 @@
 {
+	"steps": 1000000,
+	"confidence-step": 5e-6,
 	"controller-type": "episodic",
 	"cusum-threshold": 200,
-	"steps": 1000000,
 	"batch-size": 64,
 	"gamma": 0.99,
+	"metric-decay": 0.9999,
 	"nb-rollouts": 100,
 	"nb-train": 50,
 	"replay-buffer-size": 1000000,
