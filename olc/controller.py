@@ -106,7 +106,8 @@ class Controller:
 			self.actionValue = tf.placeholder(tf.float32, shape=(), name='action_value')
 			self.updateMetrics.append(ema.apply([self.actionValue]))
 			self.meanValue = ema.average(self.actionValue)
-			tf.summary.scalar('Action value', self.meanValue, collections=['metrics'])
+			tf.summary.scalar('Action value', self.actionValue, collections=['metrics'])
+			tf.summary.scalar('Action value average', self.meanValue, collections=['metrics'])
 			# Action value cusum
 			valueCusumPos = tf.get_variable('value_cusum_pos', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
 			valueCusumNeg = tf.get_variable('value_cusum_neg', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
@@ -121,7 +122,8 @@ class Controller:
 			self.reward = tf.placeholder(tf.float32, shape=(), name='reward')
 			self.updateMetrics.append(ema.apply([self.reward]))
 			self.meanReward = ema.average(self.reward)
-			tf.summary.scalar('Reward', self.meanReward, collections=['metrics'])
+			tf.summary.scalar('Reward', self.reward, collections=['metrics'])
+			tf.summary.scalar('Reward average', self.meanReward, collections=['metrics'])
 			# Reward cusum
 			rewardCusumPos = tf.get_variable('reward_cusum_pos', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
 			rewardCusumNeg = tf.get_variable('reward_cusum_neg', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
