@@ -62,7 +62,7 @@ class Controller:
 					self.noise.reset()
 					done = False
 				action = (0.5 + confidence) * self._learnedPolicy(state) + (0.5 - confidence) * self._randomPolicy(state)
-				newState, reward, done, _ = self.env.step(action)
+				newState, reward, done, info = self.env.step(action)
 				if self.settings['controller-type'] == 'continuous':
 					done = False
 				self.buffer.storeTransition(state, action, reward, newState, done)
@@ -72,6 +72,8 @@ class Controller:
 				_, confidence, metricSums = self.session.run([self.updateMetrics, self.confidence, self.metrics],
 					{self.actionValue: actionValue.item(), self.reward: reward})
 				[self.logger.logScalar('Action/' + str(i), x, step) for i, x in enumerate(action)]
+				if isinstance(info, dict) and 'error' in info:
+					self.logger.logScalar('Error', info['error'], step)
 				self.logger.writeSummary(metricSums, step)
 				if self.settings['render']:
 					self.env.render()
