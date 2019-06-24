@@ -62,7 +62,7 @@ class Controller:
 					self.noise.reset()
 					done = False
 				action = (0.5 + confidence) * self._learnedPolicy(state) + (0.5 - confidence) * self._randomPolicy(state)
-				newState, reward, done, _ = self.env.step(action)
+				newState, reward, done, info = self.env.step(action)
 				if self.settings['controller-type'] == 'continuous':
 					done = False
 				self.buffer.storeTransition(state, action, reward, newState, done)
@@ -72,6 +72,8 @@ class Controller:
 				_, confidence, metricSums = self.session.run([self.updateMetrics, self.confidence, self.metrics],
 					{self.actionValue: actionValue.item(), self.reward: reward})
 				[self.logger.logScalar('Action/' + str(i), x, step) for i, x in enumerate(action)]
+				if isinstance(info, dict) and 'error' in info:
+					self.logger.logScalar('Error', info['error'], step)
 				self.logger.writeSummary(metricSums, step)
 				if self.settings['render']:
 					self.env.render()
@@ -97,8 +99,8 @@ class Controller:
 		return self.noise.step() * (self.env.action_space.high - self.env.action_space.low)
 
 	def _setupMetrics(self):
-		decay = 0.9999
-		confidenceStep = 5e-6
+		decay = self.settings['metric-decay']
+		confidenceStep = self.settings['confidence-step']
 		self.updateMetrics = []
 		with tf.variable_scope('metrics'):
 			ema = tf.train.ExponentialMovingAverage(decay=decay)
@@ -106,31 +108,21 @@ class Controller:
 			self.actionValue = tf.placeholder(tf.float32, shape=(), name='action_value')
 			self.updateMetrics.append(ema.apply([self.actionValue]))
 			self.meanValue = ema.average(self.actionValue)
-			tf.summary.scalar('Action value', self.meanValue, collections=['metrics'])
-			# Action value cusum
-			valueCusumPos = tf.get_variable('value_cusum_pos', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
-			valueCusumNeg = tf.get_variable('value_cusum_neg', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
-			self.updateMetrics.append(tf.assign(valueCusumPos, decay * tf.maximum(0., valueCusumPos + self.actionValue - self.meanValue)))
-			self.updateMetrics.append(tf.assign(valueCusumNeg, decay * tf.minimum(0., valueCusumNeg + self.actionValue + self.meanValue)))
-			self.valueCusum = valueCusumPos + valueCusumNeg
-			self.updateMetrics.append(self.valueCusum)
-			tf.summary.scalar('Action value cusum pos', valueCusumPos, collections=['metrics'])
-			tf.summary.scalar('Action value cusum neg', valueCusumNeg, collections=['metrics'])
-			tf.summary.scalar('Action value cusum', self.valueCusum, collections=['metrics'])
+			tf.summary.scalar('Action value', self.actionValue, collections=['metrics'])
+			tf.summary.scalar('Action value average', self.meanValue, collections=['metrics'])
 			# Reward mean
 			self.reward = tf.placeholder(tf.float32, shape=(), name='reward')
 			self.updateMetrics.append(ema.apply([self.reward]))
 			self.meanReward = ema.average(self.reward)
-			tf.summary.scalar('Reward', self.meanReward, collections=['metrics'])
+			tf.summary.scalar('Reward', self.reward, collections=['metrics'])
+			tf.summary.scalar('Reward average', self.meanReward, collections=['metrics'])
 			# Reward cusum
 			rewardCusumPos = tf.get_variable('reward_cusum_pos', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
 			rewardCusumNeg = tf.get_variable('reward_cusum_neg', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
 			self.updateMetrics.append(tf.assign(rewardCusumPos, decay * tf.maximum(0., rewardCusumPos + self.reward - self.meanReward)))
-			self.updateMetrics.append(tf.assign(rewardCusumNeg, decay * tf.minimum(0., rewardCusumNeg + self.reward + self.meanReward)))
-			self.rewardCusum = rewardCusumPos + rewardCusumNeg
+			self.updateMetrics.append(tf.assign(rewardCusumNeg, decay * tf.minimum(0., rewardCusumNeg + self.reward - self.meanReward)))
+			self.rewardCusum = rewardCusumPos - rewardCusumNeg
 			self.updateMetrics.append(self.rewardCusum)
-			tf.summary.scalar('Reward cusum pos', rewardCusumPos, collections=['metrics'])
-			tf.summary.scalar('Reward cusum neg', rewardCusumNeg, collections=['metrics'])
 			tf.summary.scalar('Reward cusum', self.rewardCusum, collections=['metrics'])
 			# Confidence
 			rewardConfidence = tf.get_variable('reward_confidence', shape=(), dtype = tf.float32, initializer=tf.initializers.zeros)

@@ -78,7 +78,8 @@ class Reacher3(RoboschoolMujocoXmlEnv):
         self.done   += 0
         self.reward += sum(self.rewards)
         self.HUD(state, a, False)
-        return state, sum(self.rewards), False, {}
+        error = np.sqrt(state[2] ** 2 + state[3] ** 2)
+        return state, sum(self.rewards), False, {'error': error}
 
     def camera_adjust(self):
         x, y, z = self.fingertip.pose().xyz()
