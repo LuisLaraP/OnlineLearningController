@@ -20,9 +20,9 @@ class ReplayBuffer:
 		self.terminal = np.zeros(max_capacity, bool)
 
 	def setCapacity(self, capacity):
-		self.capacity = capacity
+		self.capacity = int(round(capacity))
 		if self.size > self.capacity:
-			self.size = capacity
+			self.size = self.capacity
 
 	def storeTransition(self, si, a, r, sf, t):
 		self.iState[self.head, :] = si

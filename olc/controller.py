@@ -37,7 +37,7 @@ class Controller:
 		for f, t in zip(criticParams, self.criticTarget.parameters):
 			t.load(f, self.session)
 		# Create replay buffer
-		self.buffer = ReplayBuffer(self.settings['replay-buffer-size'], self.actionDim, self.stateDim)
+		self.buffer = ReplayBuffer(self.settings['replay-buffer-max'], self.actionDim, self.stateDim)
 		# Create noise process
 		self.noise = OrnsteinUhlenbeck(self.actionDim,
 			self.settings['noise']['dt'],
@@ -61,7 +61,7 @@ class Controller:
 					state = self.env.reset()
 					self.noise.reset()
 					done = False
-				action = (0.5 + confidence) * self._learnedPolicy(state) + (0.5 - confidence) * self._randomPolicy(state)
+				action = 0.5 * (1. + confidence) * self._learnedPolicy(state) + 0.5 * (1. - confidence) * self._randomPolicy(state)
 				newState, reward, done, info = self.env.step(action)
 				if self.settings['controller-type'] == 'continuous':
 					done = False
@@ -78,6 +78,7 @@ class Controller:
 				if self.settings['render']:
 					self.env.render()
 			loss = 0
+			self.buffer.setCapacity(self.settings['replay-buffer-min'] + confidence * (self.settings['replay-buffer-max'] - self.settings['replay-buffer-min']))
 			for _ in range(self.settings['nb-train']):
 				loss += self._train()
 				self.session.run([self.actorTarget.update, self.criticTarget.update])
@@ -125,8 +126,8 @@ class Controller:
 			self.updateMetrics.append(self.rewardCusum)
 			tf.summary.scalar('Reward cusum', self.rewardCusum, collections=['metrics'])
 			# Confidence
-			rewardConfidence = tf.get_variable('reward_confidence', shape=(), dtype = tf.float32, initializer=tf.initializers.zeros)
-			self.updateMetrics.append(tf.assign(rewardConfidence, tf.clip_by_value(rewardConfidence + confidenceStep * tf.sign(self.settings["cusum-threshold"] - tf.abs(self.rewardCusum)), 0, 0.5)))
+			rewardConfidence = tf.get_variable('reward_confidence', shape=(), dtype=tf.float32, initializer=tf.initializers.zeros)
+			self.updateMetrics.append(tf.assign(rewardConfidence, tf.clip_by_value(rewardConfidence + confidenceStep * tf.sign(self.settings["cusum-threshold"] - tf.abs(self.rewardCusum)), 0., 1.)))
 			self.confidence = rewardConfidence
 			tf.summary.scalar('Confidence', self.confidence, collections=['metrics'])
 			# Summary merging
