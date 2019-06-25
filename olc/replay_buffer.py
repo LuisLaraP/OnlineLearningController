@@ -1,8 +1,5 @@
 """Storage for previously seen transitions."""
 
-import collections
-import random
-
 import numpy as np
 
 
