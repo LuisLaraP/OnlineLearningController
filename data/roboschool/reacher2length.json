@@ -2,7 +2,7 @@
 	"task": {
 		"name": "Reacher2length-v0"
 	},
-	"steps": 500000,
+	"steps": 1000000,
 	"save-interval": 10000,
-	"cusum-threshold": 100
+	"cusum-threshold": 150
 }
