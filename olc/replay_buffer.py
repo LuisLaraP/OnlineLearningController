@@ -1,5 +1,7 @@
 """Storage for previously seen transitions."""
 
+import random
+
 import numpy as np
 import tensorflow as tf
 
@@ -61,6 +63,6 @@ class ReplayBuffer:
 	def sample(self, n):
 		if n > self.size:
 			return [], [], [], [], []
-		idx = np.random.choice(self.size, n, replace=False)
+		idx = np.array(random.sample(range(self.size), n))
 		idx = (self.head - idx - 1 + self.max_capacity) % self.max_capacity
 		return self.iState[idx, :], self.action[idx, :], self.reward[idx], self.fState[idx, :], self.terminal[idx]
