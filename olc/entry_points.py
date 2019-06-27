@@ -22,6 +22,12 @@ def olc_train():
 		required=False,
 		help='path to a checkpoint file to load before training.'
 	)
+	parser.add_argument(
+		'-n', '--name',
+		default=None,
+		required=False,
+		help='name for the logs and checkpoibnts directories.'
+	)
 	args = parser.parse_args()
 
 	# Read settings
@@ -33,7 +39,10 @@ def olc_train():
 
 	# Create logger
 	time = datetime.datetime.now().time()
-	experimentName = '{}-{:%H:%M}'.format(settings['task']['name'], time)
+	if args.name is not None:
+		experimentName = args.name
+	else:
+		experimentName = '{}-{:%H:%M}'.format(settings['task']['name'], time)
 	logger = Logger(experimentName)
 
 	# Create controller
