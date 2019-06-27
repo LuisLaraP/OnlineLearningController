@@ -53,6 +53,7 @@ class Controller:
 		confidence = 0
 		self.buffer.save(self.session)
 		self.logger.checkpoint(self.session, 0)
+		self.test(step)
 		while step < self.settings['steps']:
 			startTime = time.time()
 			epoch += 1
@@ -87,8 +88,20 @@ class Controller:
 			if step % self.settings['save-interval'] == 0:
 				self.buffer.save(self.session)
 				self.logger.checkpoint(self.session, step)
+				self.test(step)
 			elapsed = time.time() - startTime
 			print("Epoch {}:\tSteps: {}\tTime: {:.3}s".format(epoch, step, elapsed))
+
+	def test(self, step):
+		cumReward = 0
+		for episode in range(5):
+			done = False
+			state = self.env.reset()
+			while not done:
+				action = self._learnedPolicy(state)
+				state, reward, done, _ = self.env.step(action)
+				cumReward += reward
+		self.logger.logScalar('Learning curve', cumReward / 5, step)
 
 	def _learnedPolicy(self, state):
 		action = self.session.run(self.actor.output, {
@@ -171,46 +184,3 @@ class Controller:
 				self.state: siBatch
 			})
 		return loss
-
-
-class Tester:
-
-	def __init__(self, settings, environment, checkpointDir, logger):
-		self.settings = settings
-		self.env = environment
-		self.logger = logger
-		self.actionDim = self.env.action_space.low.size
-		self.stateDim = self.env.observation_space.low.size
-		self.action = tf.placeholder(tf.float32, (None, self.actionDim), name='action')
-		self.state = tf.placeholder(tf.float32, (None, self.stateDim), name='state')
-		self.isTraining = tf.placeholder_with_default(False, None, 'is_training')
-		self.actor = Actor('actor', self.settings['actor'], self.state, self.isTraining, self.env.action_space.high, self.env.action_space.low)
-		self.paths = tf.train.get_checkpoint_state(checkpointDir).all_model_checkpoint_paths
-		self.globalStep = tf.train.get_or_create_global_step()
-
-	def run(self):
-		self.saver = tf.train.Saver(var_list=self.actor.parameters + [self.globalStep])
-		self.session = tf.Session()
-		self.session.run(tf.global_variables_initializer())
-		for i, path in enumerate(self.paths):
-			self.saver.restore(self.session, path)
-			step = self.session.run(self.globalStep)
-			cumReward = 0
-			sys.stdout.flush()
-			for episode in range(5):
-				done = False
-				state = self.env.reset()
-				while not done:
-					# self.env.render()
-					action = self._learnedPolicy(state)
-					state, reward, done, _ = self.env.step(action)
-					cumReward += reward
-			self.logger.logScalar('Learning Curve', cumReward, step)
-			print('Step {}\tAvg reward:{}'.format(step, cumReward / 5))
-
-	def _learnedPolicy(self, state):
-		action = self.session.run(self.actor.output, {
-			self.state: [state],
-			self.isTraining: False
-		})
-		return action[0]
