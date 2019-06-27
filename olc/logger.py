@@ -10,12 +10,12 @@ class Logger:
 
 	def checkpoint(self, session, step):
 		if self.saver is None:
-			self.saver = tf.train.Saver(max_to_keep=1024)
+			self.saver = tf.train.Saver(max_to_keep=1)
 		self.saver.save(session, self.savePath, global_step=step)
 
 	def loadCheckpoint(self, session, path):
 		if self.saver is None:
-			self.saver = tf.train.Saver(max_to_keep=1024)
+			self.saver = tf.train.Saver(max_to_keep=1)
 		self.saver.restore(session, path)
 
 	def logGraph(self):
