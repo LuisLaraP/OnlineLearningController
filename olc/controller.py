@@ -36,8 +36,6 @@ class Controller:
 		criticParams = self.session.run(self.critic.parameters)
 		for f, t in zip(criticParams, self.criticTarget.parameters):
 			t.load(f, self.session)
-		# Create replay buffer
-		self.buffer = ReplayBuffer(self.settings['replay-buffer-max'], self.actionDim, self.stateDim)
 		# Create noise process
 		self.noise = OrnsteinUhlenbeck(self.actionDim,
 			self.settings['noise']['dt'],
@@ -47,11 +45,13 @@ class Controller:
 		# Load checkpoint if provided
 		if self.checkpoint is not None:
 			self.logger.loadCheckpoint(self.session, self.checkpoint)
+			self.buffer.restore(self.session)
 		# Training
 		epoch = 0
 		step = 0
 		done = True
 		confidence = 0
+		self.buffer.save(self.session)
 		self.logger.checkpoint(self.session, 0)
 		while step < self.settings['steps']:
 			startTime = time.time()
@@ -85,6 +85,7 @@ class Controller:
 			loss /= self.settings['nb-train']
 			self.logger.logScalar('Critic loss', loss, step)
 			if step % self.settings['save-interval'] == 0:
+				self.buffer.save(self.session)
 				self.logger.checkpoint(self.session, step)
 			elapsed = time.time() - startTime
 			print("Epoch {}:\tSteps: {}\tTime: {:.3}s".format(epoch, step, elapsed))
@@ -147,6 +148,7 @@ class Controller:
 		self.actorTarget.createUpdateOps(self.settings['tau'], self.actor.parameters)
 		self.criticTarget.createUpdateOps(self.settings['tau'], self.critic.parameters)
 		self.incrementStep = tf.assign_add(tf.train.get_or_create_global_step(), 1)
+		self.buffer = ReplayBuffer(self.settings['replay-buffer-max'], self.actionDim, self.stateDim)
 
 	def _train(self):
 		siBatch, aBatch, rBatch, sfBatch, tBatch = self.buffer.sample(self.settings['batch-size'])
