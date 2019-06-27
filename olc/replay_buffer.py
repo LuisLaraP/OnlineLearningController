@@ -17,6 +17,9 @@ class ReplayBuffer:
 		self.fState = np.zeros((max_capacity, stateDim))
 		self.terminal = np.zeros(max_capacity, bool)
 		with tf.variable_scope('replay_buffer', initializer=tf.initializers.zeros):
+			self.cap = tf.get_variable('capacity', (), dtype=tf.int32, trainable=False)
+			self.h = tf.get_variable('head', (), dtype=tf.int32, trainable=False)
+			self.sz = tf.get_variable('size', (), dtype=tf.int32, trainable=False)
 			self.si = tf.get_variable('s_i', (max_capacity, stateDim), dtype=tf.float32, trainable=False)
 			self.a = tf.get_variable('a', (max_capacity, actionDim), dtype=tf.float32, trainable=False)
 			self.r = tf.get_variable('r', (max_capacity,), dtype=tf.float32, trainable=False)
@@ -24,16 +27,21 @@ class ReplayBuffer:
 			self.t = tf.get_variable('t', (max_capacity,), dtype=tf.bool, trainable=False)
 
 	def restore(self, session):
-		self.iState, self.action, self.reward, self.fState, self.terminal = session.run(
-			[self.si, self.a, self.r, self.sf, self.t]
+		self.capacity, self.head, self.size, self.iState, self.action, self.reward, self.fState, self.terminal = session.run(
+			[self.cap, self.h, self.sz, self.si, self.a, self.r, self.sf, self.t]
 		)
+		print(self.capacity)
 
 	def save(self, session):
+		self.cap.load(self.capacity, session)
+		self.h.load(self.head, session)
+		self.sz.load(self.size, session)
 		self.si.load(self.iState, session)
 		self.a.load(self.action, session)
 		self.r.load(self.reward, session)
 		self.sf.load(self.fState, session)
 		self.t.load(self.terminal, session)
+		print(self.capacity)
 
 	def setCapacity(self, capacity):
 		self.capacity = int(round(capacity))
