@@ -27,7 +27,6 @@ class ReplayBuffer:
 		self.iState, self.action, self.reward, self.fState, self.terminal = session.run(
 			[self.si, self.a, self.r, self.sf, self.t]
 		)
-		print(self.iState[0, :])
 
 	def save(self, session):
 		self.si.load(self.iState, session)
@@ -35,7 +34,6 @@ class ReplayBuffer:
 		self.r.load(self.reward, session)
 		self.sf.load(self.fState, session)
 		self.t.load(self.terminal, session)
-		print(self.iState[0, :])
 
 	def setCapacity(self, capacity):
 		self.capacity = int(round(capacity))

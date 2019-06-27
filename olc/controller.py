@@ -201,7 +201,7 @@ class Tester:
 				done = False
 				state = self.env.reset()
 				while not done:
-					self.env.render()
+					# self.env.render()
 					action = self._learnedPolicy(state)
 					state, reward, done, _ = self.env.step(action)
 					cumReward += reward
