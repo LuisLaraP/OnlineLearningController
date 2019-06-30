@@ -3,13 +3,13 @@ from roboschool.scene_abstract import SingleRobotEmptyScene
 from roboschool.gym_mujoco_xml_env import RoboschoolMujocoXmlEnv
 
 
-class Reacher7(RoboschoolMujocoXmlEnv):
+class Reacher4(RoboschoolMujocoXmlEnv):
 
-	definitionFile = 'reacher7.xml'
+	definitionFile = 'reacher4.xml'
 
 	def __init__(self):
-		self.action_dim = 6
-		self.obs_dim = 15
+		self.action_dim = 3
+		self.obs_dim = 9
 		RoboschoolMujocoXmlEnv.__init__(self, self.definitionFile, 'body0', action_dim=self.action_dim, obs_dim=self.obs_dim)
 		self.theta = np.zeros(self.action_dim)
 		self.theta_dot = np.zeros(self.action_dim)
@@ -29,7 +29,7 @@ class Reacher7(RoboschoolMujocoXmlEnv):
 			if limits[0] < limits[1]:
 				self.jdict[key].reset_current_position(np.random.uniform(low=limits[0], high=limits[1]), 0)
 			else:
-				self.jdict[key].reset_current_position(np.random.uniform(low=3.14, high=3.14), 0)
+				self.jdict[key].reset_current_position(np.random.uniform(low=-3.14, high=3.14), 0)
 
 	def apply_action(self, a):
 		assert(np.isfinite(a).all())

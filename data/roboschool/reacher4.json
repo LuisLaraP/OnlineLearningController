@@ -1,0 +1,9 @@
+{
+	"task": {
+		"name": "Reacher4-v0"
+	},
+	"steps": 500000,
+	"save-interval": 10000,
+	"cusum-threshold": 400,
+	"render": true
+}
