@@ -5,8 +5,6 @@ from roboschool.gym_mujoco_xml_env import RoboschoolMujocoXmlEnv
 
 class Reacher4(RoboschoolMujocoXmlEnv):
 
-	definitionFile = 'reacher4.xml'
-
 	def __init__(self):
 		self.action_dim = 3
 		self.obs_dim = 9
@@ -73,3 +71,13 @@ class Reacher4(RoboschoolMujocoXmlEnv):
 		x *= 0.5
 		y *= 0.5
 		self.camera.move_and_look_at(0.3, 0.3, 0.3, x, y, z)
+
+
+class Reacher4Base(Reacher4):
+
+	definitionFile = 'reacher4.xml'
+
+
+class Reacher4Length(Reacher4):
+
+	definitionFile = 'reacher4length.xml'

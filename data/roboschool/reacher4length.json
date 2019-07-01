@@ -1,6 +1,6 @@
 {
 	"task": {
-		"name": "Reacher4-v0"
+		"name": "Reacher4Length-v0"
 	},
 	"steps": 500000,
 	"save-interval": 10000,
