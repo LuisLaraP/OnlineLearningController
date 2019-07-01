@@ -37,6 +37,7 @@ class Reacher4(RoboschoolMujocoXmlEnv):
 		for i in range(self.action_dim):
 			key = 'joint' + str(i)
 			self.jdict[key].set_motor_torque(action[i].item())
+			#self.jdict[key].set_motor_torque(-1)
 
 	def calc_state(self):
 		for i in range(self.action_dim):
@@ -59,7 +60,8 @@ class Reacher4(RoboschoolMujocoXmlEnv):
 		potential_old = self.potential
 		self.potential = self.calc_potential()
 		electricity_cost = -0.10 * np.dot(np.abs(a), np.abs(self.theta_dot)) - 0.01 * np.abs(a).sum()
-		self.rewards = [float(self.potential - potential_old), float(electricity_cost), 0]
+		stuck_joint_cost = -np.count_nonzero(np.abs(np.abs(self.theta[2:]) - 1.) < 0.1)
+		self.rewards = [float(self.potential - potential_old), float(electricity_cost), stuck_joint_cost]
 		self.frame += 1
 		self.done += 0
 		self.reward += sum(self.rewards)
