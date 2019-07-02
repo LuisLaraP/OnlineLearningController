@@ -35,7 +35,6 @@ class Reacher4(RoboschoolMujocoXmlEnv):
 		for i in range(self.action_dim):
 			key = 'joint' + str(i)
 			self.jdict[key].set_motor_torque(action[i].item())
-			#self.jdict[key].set_motor_torque(-1)
 
 	def calc_state(self):
 		for i in range(self.action_dim):
@@ -81,3 +80,46 @@ class Reacher4Base(Reacher4):
 class Reacher4Length(Reacher4):
 
 	definitionFile = 'reacher4length.xml'
+
+
+class Reacher4Motor(Reacher4):
+
+	definitionFile = 'reacher4motor.xml'
+
+	def robot_specific_reset(self):
+		self.jdict["target_x"].reset_current_position(self.np_random.uniform(low=-0.47, high=0.47), 0)
+		self.jdict["target_y"].reset_current_position(self.np_random.uniform(low=-0.47, high=0.47), 0)
+		self.jdict["target_z"].reset_current_position(self.np_random.uniform(low=0, high=0.47), 0)
+		self.fingertip = self.parts["fingertip"]
+		self.target = self.parts["target"]
+		for i in range(self.action_dim):
+			if i == 2:
+				continue
+			key = 'joint' + str(i)
+			limits = self.jdict[key].limits()[:2]
+			if limits[0] < limits[1]:
+				self.jdict[key].reset_current_position(np.random.uniform(low=limits[0], high=limits[1]), 0)
+			else:
+				self.jdict[key].reset_current_position(np.random.uniform(low=-3.14, high=3.14), 0)
+
+	def apply_action(self, a):
+		assert(np.isfinite(a).all())
+		action = 0.05 * np.clip(a, -1, 1)
+		for i in range(self.action_dim):
+			if i == 2:
+				continue
+			key = 'joint' + str(i)
+			self.jdict[key].set_motor_torque(action[i].item())
+
+	def calc_state(self):
+		for i in range(self.action_dim):
+			if i == 2:
+				self.theta[i], self.theta_dot[i] = (0., 0.)
+				continue
+			key = 'joint' + str(i)
+			self.theta[i], self.theta_dot[i] = self.jdict[key].current_relative_position()
+		target_x, _ = self.jdict["target_x"].current_position()
+		target_y, _ = self.jdict["target_y"].current_position()
+		target_z, _ = self.jdict["target_z"].current_position()
+		self.to_target_vec = np.array(self.fingertip.pose().xyz()) - np.array(self.target.pose().xyz())
+		return np.append([target_x, target_y, target_z], [self.theta, self.theta_dot])
