@@ -1,8 +1,8 @@
 {
 	"task": {
-		"name": "Reacher2motor-v0"
+		"name": "Reacher3motor-v0"
 	},
 	"steps": 500000,
 	"save-interval": 10000,
-	"cusum-threshold": 150
+	"cusum-threshold": 400
 }

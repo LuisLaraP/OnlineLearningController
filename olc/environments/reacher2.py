@@ -121,7 +121,7 @@ class Reacher2Motor(Reacher2):
 
     def calc_state(self):
         theta,      self.theta_dot = self.central_joint.current_relative_position()
-        self.gamma, self.gamma_dot = (0.173, 0.)
+        self.gamma, self.gamma_dot = (0., 0.)
         target_x, _ = self.jdict["target_x"].current_position()
         target_y, _ = self.jdict["target_y"].current_position()
         self.to_target_vec = np.array(self.fingertip.pose().xyz()) - np.array(self.target.pose().xyz())
